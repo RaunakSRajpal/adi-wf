@@ -1,0 +1,1 @@
+savedcmd_/home/raunak/wise-rsr/drivers/hello_world/Module.symvers :=  scripts/mod/modpost -M -m       -o /home/raunak/wise-rsr/drivers/hello_world/Module.symvers -T /home/raunak/wise-rsr/drivers/hello_world/modules.order -i Module.symvers -e 

@@ -1,0 +1,8 @@
+make -C /home/raunak/wise-rsr/linux-adi M=/home/raunak/wise-rsr/drivers/gpio_dummy modules
+make[1]: Entering directory '/home/raunak/wise-rsr/linux-adi'
+  CC [M]  /home/raunak/wise-rsr/drivers/gpio_dummy/gpio_test.o
+  MODPOST /home/raunak/wise-rsr/drivers/gpio_dummy/Module.symvers
+  CC [M]  /home/raunak/wise-rsr/drivers/gpio_dummy/gpio_test.mod.o
+  CC [M]  /home/raunak/wise-rsr/drivers/gpio_dummy/.module-common.o
+  LD [M]  /home/raunak/wise-rsr/drivers/gpio_dummy/gpio_test.ko
+make[1]: Leaving directory '/home/raunak/wise-rsr/linux-adi'
