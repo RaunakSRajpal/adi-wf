@@ -17,29 +17,40 @@ LOGFILE=$HDL_DIR/setup-HDL.log
 BUILD_DIR="/$ADI_DIR/build_boot_bin"
 OUTPUT_DIR="$ADI_DIR/output_boot_bin"
 
+usage() {
+    echo -e "[ERROR]\t$1\n" | tee -a $LOGFILE >&2
+    echo -e "\t\t usage: $0 <eval_bd> <carrier_bd> \n" | tee -a $LOGFILE 2>&1
+    exit 1
+}
+
 error() {
     echo -e "[ERROR]\t$1\n" | tee -a $LOGFILE >&2
-    echo -e "\t\t usage: $0 \'eval_bd\' \'carrier_bd\' \n" | tee -a $LOGFILE 2>&1
     exit 1
+}
+
+status() {
+    echo -e "[INFO]\t$1" | tee -a $LOGFILE 2>&1
 }
 
 
 ## Test for arguments
-    ### Test if HDL directory is present,, otherwise clone repo
-    # -----TO DO------ #
+    ### Test if HDL directory is present
+    [ -d $HDL_DIR ] || \
+            error "hdl directory not found..\n\t\t \
+                        try: bash init-adi-hdl.sh <eval_bd> <carrier_bd>"
     
     cd $HDL_DIR
     touch $LOGFILE
     
     if [ -z $EVAL_BOARD ]; then
-     		error "ADI Evaluation board not specified"
+     		usage "ADI Evaluation board not specified"
     else
        [ -d "$HDL_DIR/projects/$EVAL_BOARD" ] || \
     		error "Evaluation board not found"
     fi
      
     if [ -z $CARRIER ]; then
-    		error "ADI Carrier board not specified"
+    		usage "ADI Carrier board not specified"
     else
        [ -d "$HDL_DIR/projects/$EVAL_BOARD/$CARRIER" ] || \
     		error "Carrier board not found"
@@ -97,7 +108,7 @@ error() {
     
     echo "BOOT.BIN created!" | tee $LOGFILE 2>&1
 
-    #---- u-boot script ----
+    #---- build linux script ----
     # bash ../setup-uboot-proj.sh linux-adi/ xilinx/zynq-adrv9361-z7035-bob-cmos.dtb
 
 
