@@ -13,15 +13,17 @@ set -e
 #           toolchains by default. Note, it will automatically install 
 #           the required toolchains if it cannot locate any specified.
 # 
-#       4>  The config definition file to be built (optional). By default 
+#       4>  TODO--update??The config definition file to be built (optional). By default 
 #           it makes kernel config for a zynq based project. 
 # ------------------------------------------------------------------------------
 
 
+WS="$(pwd)"
 LINUX_DIR=${1:-"linux-adi"}
 DTFILE=$2
 CROSS_COMPILE="$3"            # "/lib/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-"}
-LOGFILE="./SETUP-kernel.log"
+lnx_branch=${4:-"main"}
+LOGFILE="$WS/SETUP-kernel.log"
 
 XVERSION="2024.2"
 
@@ -30,9 +32,14 @@ XVERSION="2024.2"
 # the directory: $LINUX_DIR/arch/arm/boot/dts/xilinx/
 # ----------------------------------------------------------------
 
-error() {
+usage() {
     echo -e "[ERROR]\t$1\n" | tee -a $LOGFILE >&2
     echo -e "\tusage: $0 <linux-repo dir> <device-tree file> \n" | tee -a $LOGFILE 2>&1
+    exit 1
+}
+
+error() {
+    echo -e "[ERROR]\t$1\n" | tee -a $LOGFILE >&2
     exit 1
 }
 
@@ -67,11 +74,12 @@ CONFIG_GEN_FILE=${4:-"zynq_xcomm_adv7511_defconfig"}
                     -- linux | tee -a $LOGFILE 2>&1
             mv -b linux/ linux-adi/
             status "linux repository cloned"
+            git checkout $lnx_branch
     }
     
     # Device-tree file
     if  [ -z "$DTFILE" ]; then 
-            error "No device tree file specified" 
+            usage "No device tree file specified" 
             exit 1
     else
             DTFILE="${DTFILE%.*}.dtb"
@@ -87,7 +95,7 @@ CONFIG_GEN_FILE=${4:-"zynq_xcomm_adv7511_defconfig"}
                     status "Using cross-compile toolchain: $CROSS_COMPILE"
                     CC_CHECK='1'
             else
-                    error "$CROSS_COPILE: specified toolchain not found"
+                    usage "$CROSS_COPILE: specified toolchain not found"
             fi \
     || \
             if type "arm-linux-gnueabihf-gcc" >/dev/null 2>&1 ; then
