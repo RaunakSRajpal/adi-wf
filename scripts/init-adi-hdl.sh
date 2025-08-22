@@ -1,8 +1,8 @@
 #!/bin/bash
-set -xe
+set -e
 
 WS="$(pwd)"
-ADI_DIR="$WS/adi-hdl"
+ADI_DIR="$WS/adi-hdl-1"
 HDL_DIR="$ADI_DIR/hdl"
 XVERSION="2024.2"
 
@@ -23,10 +23,21 @@ error() {
     exit 1
 }
 
+status() {
+    echo -e "[INFO]\t$1" | tee -a $LOGFILE 2>&1
+}
+
 
 ## Test for arguments
     ### Test if HDL directory is present,, otherwise clone repo
-    # -----TO DO------ #
+    mkdir -p $ADI_DIR/
+    [ -d "$ADI_DIR/hdl" ] || {
+            status "ADI hdl directory not found... installing from \'analogdevicesinc\' repository"
+            git clone https://github.com/analogdevicesinc/hdl.git \
+                    --no-single-branch --depth=10 \
+                    -- hdl | tee -a $LOGFILE 2>&1
+            status "analogdevicesinc/hdl repository cloned"
+    }
     
     cd $HDL_DIR
     touch $LOGFILE
@@ -63,5 +74,6 @@ error() {
     (
         cd $HDL_DIR/projects/$EVAL_BOARD/$CARRIER/ && \
         make -j5
+        status "Project $EVAL_BOARD-$CARRIER: build complete"
     )
 
