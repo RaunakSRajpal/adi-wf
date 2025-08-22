@@ -52,11 +52,9 @@ status() {
     ### Test if HDL directory is present,, otherwise clone repo    
     [ -d "$ADI_DIR/hdl" ] || {
             status "ADI hdl directory not found... installing from \'analogdevicesinc\' repository"
-            git clone https://github.com/analogdevicesinc/hdl.git \
-                    --no-single-branch \
-                    -- hdl | tee -a $LOGFILE 2>&1
+            git clone https://github.com/analogdevicesinc/hdl.git | tee -a $LOGFILE 2>&1
             status "analogdevicesinc/hdl repository cloned"
-            git checkout $hdl_branch
+            cd hdl/ && git checkout $hdl_branch
     }
     
     [ -d "$HDL_DIR/projects/$EVAL_BD" ] || \
@@ -79,7 +77,7 @@ status() {
     
 
 ## Build HDL project 
-    # export ADI_IGNORE_VERSION_CHECK=1
+    export ADI_IGNORE_VERSION_CHECK=1
     (
         cd $HDL_DIR/projects/$EVAL_BD/$CARRIER/ && \
         make -j5 | tee -a $LOGFILE 2>&1
