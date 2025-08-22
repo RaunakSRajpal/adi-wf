@@ -2,7 +2,8 @@
 set -xe
 
 
-ADI_DIR="/home/raunak/wise-rsr/adi-hdl"
+WS="$(pwd)"
+ADI_DIR="$WS/adi-hdl"
 HDL_DIR="$ADI_DIR/hdl"
 XVERSION="2024.2"
 
