@@ -11,29 +11,33 @@
 
 #include <asm/io.h>
 
-MODULE_LICENSE("Dual BSD/GPL");
-MODULE_AUTHOR("rsrajpal@bu.edu");
-MODULE_DESCRIPTION("Test gpio device drivers for Zynq-7035");
-MODULE_VERSION("1.0");
-
 /* Global variables/defines */
-//----TODO----//
+#define XGPIOPS_BASE_ADDR       (uint32_t*)0xE000A000
+#define XGPIOPS_DATA__(X)       (uint32_t*)0x00000040 + (X*4)
+#define XGPIOPS_DATA_RO__(X)    (uint32_t*)0x00000060 + (X*4)
+#define XGPIOPS_DIRM__(X)       (uint32_t*)0x00000204 + (X*4 << 1)
+#define XGPIOPS_OEN__(X)        (uint32_t*)0x00000208 + (X*4 << 1)
+
+static unsigned int *gpio_registers = NULL;
 static struct proc_dir_entry *gpio_proc = NULL;
 static char databuf[1025] = {0};
+#define PROCFS_NAME gpio_driver
 
-/* -------- Function declarations -------- */
+/* ---------------- Function declarations ---------------- */
+
 static int gpio_on(unsigned int pin);
 static int gpio_off(unsigned int pin);
-
 /* module functions */
 static int  __init gpio_driver_init(void);
 static void __exit gpio_driver_exit(void);
-
 /* device file-ops functions */
 // static size_t gpio_open(struct inode *inode, struct file *file);
 // static size_t gpio_release(struct inode *inode, struct file *file);
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset);
 static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t buf_size, loff_t *offset);
+
+/********************************************************** */
+
 
 static const struct proc_ops gpio_ops = {
     // .proc_op   =   gpio_open,
@@ -43,15 +47,26 @@ static const struct proc_ops gpio_ops = {
 };
 
 
-/* -------- Function definitions -------- */
-static int gpio_on(unsigned int pin) {
-    // TODO -- REG OPS
-    return 0;
+/* ----------------- Function definitions ----------------- */
+
+static int gpio_on(unsigned int bank, unsigned int pin) {
+    unsigned int *dirm_x = gpio_registers + (uint32_t*)XGPIOPS_DIRM__(bank);
+    unsigned int *oen_x  = gpio_registers + (uint32_t*)XGPIOPS_OEN__(bank);
+    unsigned int *data_x = gpio_registers + (uint32_t*)XGPIOPS_DATA_RO__(bank);
+    // REG - OPS
+    *dirm_x |= (1 << pin);
+    *oen_x |= (1 << pin);
+    *data_x |= (1 << pin);
 }
 
-static int gpio_off(unsigned int pin) {
-    // TODO -- REG OPS
-    return 0;
+static int gpio_off(unsigned int bank, unsigned int pin) {
+    unsigned int *dirm_x = gpio_registers + (uint32_t*)XGPIOPS_DIRM__(bank);
+    unsigned int *oen_x  = gpio_registers + (uint32_t*)XGPIOPS_OEN__(bank);
+    unsigned int *data_x = gpio_registers + (uint32_t*)XGPIOPS_DATA_RO__(bank);
+    // REG - OPS
+    *dirm_x |= (1 << pin);
+    *oen_x |= (1 << pin);
+    *data_x &= ~(1 << pin);
 }
 
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset) {
@@ -77,32 +92,41 @@ static int __init gpio_driver_init(void) {
 	
 	memset(databuf, 0x0, sizeof(databuf));
 	
-	// gpio_registers = (int*)ioremap();
-	// if (gpio_registers == NULL)
-	// {
-	// 	printk("Failed to map GPIO memory to driver\n");
-	// 	return -1;
-	// }
+	gpio_registers = (unsigned int*)ioremap(XGPIOPS_BASE_ADDR, PAGE_SIZE);
+	if (gpio_registers == NULL)
+	{
+		printk("Failed to map GPIO memory to driver\n");
+		return -1;
+	}
 	
-	// printk("Successfully mapped in GPIO memory\n");
+	printk("Successfully mapped in GPIO memory\n");
 	
 	// create an entry in the proc-fs
-	gpio_proc = proc_create("gpio_driver", 0666, NULL, &gpio_ops);
+	gpio_proc = proc_create("PROCFS_NAME", 0666, NULL, &gpio_ops);
 	if (gpio_proc == NULL) {
+		printk("ERROR: Failed to initialize process %s\n", PROCFS_NAME);
 	    return -1;
 	}
+
+	printk("%s: process succesfully created\n", PROCFS_NAME);
 
 	return 0;
 }
 
 static void __exit gpio_driver_exit(void) {
-	printk("killing process.. gpio driver released!\n");
-	// iounmap();
+	printk("killing process.. %s removed\n", );
+	iounmap(gpio_registers);
 	proc_remove(gpio_proc);
 	return;
 }
+
+/********************************************************** */
 
 
 module_init(gpio_driver_init);
 module_exit(gpio_driver_exit);
 
+MODULE_LICENSE("Dual BSD/GPL");
+MODULE_AUTHOR("rsrajpal@bu.edu");
+MODULE_DESCRIPTION("Test gpio device drivers for Zynq-7035");
+MODULE_VERSION("1.0");
