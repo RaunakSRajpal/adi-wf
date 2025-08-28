@@ -31,10 +31,13 @@ int main() {
     
     while (true)
     {
-        xgpio_readreg(fd, rd_buffer, 8);
-        printf("sw[0]: %s", rd_buffer);
-        xgpio_readreg(fd, rd_buffer, 9);
-        printf("sw[0]: %s", rd_buffer);
+        // xgpio_readreg(fd, rd_buffer, 8);
+        // printf("sw[0]: %s", rd_buffer);
+        // xgpio_readreg(fd, rd_buffer, 9);
+        // printf("sw[0]: %s", rd_buffer);
+        xgpio_writereg(fd, wr_buffer, led, true);
+        usleep(500000);
+        xgpio_writereg(fd, wr_buffer, led, false);
         usleep(500000);
     }
 

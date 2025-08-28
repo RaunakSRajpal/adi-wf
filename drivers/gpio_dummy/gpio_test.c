@@ -10,6 +10,7 @@
 #include <linux/fcntl.h> /* O_ACCMODE */
 
 #include <asm/io.h>
+#include <string.h>
 
 /* ---------------- Global variables/macros --------------- */
 #define XGPIOPS_BASE_ADDR       (uint32_t*)0xE000A000
@@ -23,7 +24,7 @@
 
 #define PROCFS_NAME "gpio_driver"
 #define PROCFS_BUF_SIZE 1024
-static unsigned int *gpio_registers = NULL;
+static uint32_t *gpio_registers = NULL;
 static struct proc_dir_entry *gpio_proc = NULL;
 static char databuf[PROCFS_BUF_SIZE] = {0};
 
@@ -77,7 +78,7 @@ static int gpio_off(unsigned int bank, unsigned int pin) {
 
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset) {
     printk("GPIO_XOR: Reading Device\n");
-	static char read_databuf[1025] = {0};
+	// sprintf("", );
 
     return (*offset || copy_to_user(devbuf, "Welcome!", 8)) ? 0 : 8;
 }
@@ -129,7 +130,7 @@ static int __init gpio_driver_init(void) {
 	memset(databuf, 0x0, sizeof(databuf));
 	
 	/* define a pointer to map gpio register banks for a full page*/
-	gpio_registers = (unsigned int*)ioremap(XGPIOPS_BASE_ADDR, PAGE_SIZE);
+	gpio_registers = (uint32_t*)ioremap(XGPIOPS_BASE_ADDR, PAGE_SIZE);
 	if (gpio_registers == NULL) {
 		printk("ERROR: driver %s: failed to map GPIO memory\n", PROCFS_NAME);
 		return -1;
