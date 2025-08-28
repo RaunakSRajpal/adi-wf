@@ -18,10 +18,11 @@
 #define XGPIOPS_DIRM__(X)       (uint32_t*)0x00000204 + (X*4 << 1)
 #define XGPIOPS_OEN__(X)        (uint32_t*)0x00000208 + (X*4 << 1)
 
+#define PROCFS_NAME "gpio_driver"
+#define PROCFS_BUF_SIZE 1024
 static unsigned int *gpio_registers = NULL;
 static struct proc_dir_entry *gpio_proc = NULL;
-static char databuf[1025] = {0};
-#define PROCFS_NAME gpio_driver
+static char databuf[PROCFS_BUF_SIZE] = {0};
 
 /* ---------------- Function declarations ---------------- */
 
@@ -71,16 +72,28 @@ static int gpio_off(unsigned int bank, unsigned int pin) {
 
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset) {
     printk("GPIO_XOR: Reading Device\n");
+	static char read_databuf[1025] = {0};
 
-    return copy_to_user(devbuf, "Welcome!", 8) ? 0 : 8;
+    return (*offset || copy_to_user(devbuf, "Welcome!", 8)) ? 0 : 8;
 }
 
 static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t buf_size, loff_t *offset) {
     printk("GPIO_XOR: Writing to Device\n");
-    int ret;
-    ret = copy_from_user(databuf, devbuf, 8);
-    if (ret)
-        return 0;
+	int ret_val;
+
+	if (buf_size >= PROCFS_BUF_SIZE)
+		buf_size = PROCFS_BUF_SIZE - 1;
+
+    ret_val = copy_from_user(databuf, devbuf, buf_size);
+	
+    if (ret_val) {
+		printk("ERROR: buffer overflow: %d\n", ret_val);
+		return -1;
+	}
+	else {
+		printk("%s: writing %d bytes to kernel buffer\n", PROCFS_NAME, ret_val);
+		return 0;
+	}
         
     printk("data input: %s\n", databuf);
 
@@ -88,23 +101,22 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 }
 
 static int __init gpio_driver_init(void) {
-	printk("initialising gpio driver!\n");
+	printk("initialising driver: %s...\n", PROCFS_NAME);
 	
 	memset(databuf, 0x0, sizeof(databuf));
 	
 	gpio_registers = (unsigned int*)ioremap(XGPIOPS_BASE_ADDR, PAGE_SIZE);
-	if (gpio_registers == NULL)
-	{
-		printk("Failed to map GPIO memory to driver\n");
+	if (gpio_registers == NULL) {
+		printk("ERROR: driver %s: failed to map GPIO memory\n", PROCFS_NAME);
 		return -1;
 	}
 	
 	printk("Successfully mapped in GPIO memory\n");
 	
 	// create an entry in the proc-fs
-	gpio_proc = proc_create("PROCFS_NAME", 0666, NULL, &gpio_ops);
+	gpio_proc = proc_create(PROCFS_NAME, 0666, NULL, &gpio_ops);
 	if (gpio_proc == NULL) {
-		printk("ERROR: Failed to initialize process %s\n", PROCFS_NAME);
+		printk("ERROR: process %s: Failed to initialize\n", PROCFS_NAME);
 	    return -1;
 	}
 
@@ -114,7 +126,7 @@ static int __init gpio_driver_init(void) {
 }
 
 static void __exit gpio_driver_exit(void) {
-	printk("killing process.. %s removed\n", );
+	printk("killing process.. %s removed\n", PROCFS_NAME);
 	iounmap(gpio_registers);
 	proc_remove(gpio_proc);
 	return;
