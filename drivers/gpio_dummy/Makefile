@@ -3,6 +3,7 @@ KERNEL		:= /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
 
 obj-m += $(BINARY).o
+obj-m += usr_test.o
 
 CC		= $(CROSS_COMPILE)gcc
 LD		= $(CROSS_COMPILE)ld
@@ -14,7 +15,7 @@ READELF		= $(CROSS_COMPILE)readelf
 STRIP		= $(CROSS_COMPILE)strip
 
 export CROSS_COMPILE ARCH CC LD AR NM 
-export STRIP READELF OBJCOP OBJDUMP
+export STRIP READELF OBJCOPY OBJDUMP
 
 all:
 		make -C $(KERNEL) M=$(KMOD_DIR) modules

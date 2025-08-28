@@ -1,5 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+static  xgpio_readreg(int file_desc, char *buf, int pin) {
+    ssize_t nbytes = read(file_desc,buf,sizeof(buf));
+    printf("no. of bytes read: %d\n", nbytes);
+
+    return 
+}
+
+void xgpio_writereg(int file_desc, char *buf, int pin, int value) {
+    sprintf(buf, "(%d,%d)", pin, value);
+    ssize_t nbytes = write(file_desc,buf,sizeof(buf));
+    return;
+}
 
 int main() {
 
@@ -8,10 +26,18 @@ int main() {
         perror("Failed to open file\n\n", fd);
         return 1;
     }
+
+    char rd_buffer[1024];
+    char wr_buffer[1024];
     
-    char buf[1025];
-    ssize_t nbytes = read(fd,buf,sizeof(buf));
-    printf("no. of bytes read: %d\n", nbytes);
+    while (true)
+    {
+        xgpio_readreg(fd, rd_buffer, 8);
+        printf("sw[0]: %s", rd_buffer);
+        xgpio_readreg(fd, rd_buffer, 9);
+        printf("sw[0]: %s", rd_buffer);
+        usleep(500000);
+    }
 
     return 0;
 }

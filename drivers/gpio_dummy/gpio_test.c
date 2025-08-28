@@ -103,7 +103,7 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 	}
 
 	/* scan and check the buffer entry from user */
-	if (sscanf(databuf, "%d,%d", &pin, &value) != 2) {
+	if (sscanf(databuf, "(%d,%d)", &pin, &value) != 2) {
 		printk("ERROR: %s: Inproper data format\n", PROCFS_NAME);
 		return buf_size;
 	}
