@@ -11,7 +11,7 @@
 
 #include <asm/io.h>
 
-/* ---------------- Global variables/defines ---------------- */
+/* ---------------- Global variables/macros --------------- */
 #define XGPIOPS_BASE_ADDR       (uint32_t*)0xE000A000
 #define XGPIOPS_DATA__(X)       (uint32_t*)0x00000040 + (X*4)
 #define XGPIOPS_DATA_RO__(X)    (uint32_t*)0x00000060 + (X*4)
@@ -48,7 +48,7 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 static const struct proc_ops gpio_ops = {
     // .proc_op   =   gpio_open,
     // .proc_re   =   gpio_release,
-    .proc_read   =   gpio_read,
+    .proc_read    =   gpio_read,
     .proc_write   =   gpio_write
 };
 
@@ -115,7 +115,7 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 
 	if (value)
 		gpio_on((pin / GPIO_REG_SIZE), (pin % GPIO_REG_SIZE));
-	else (value)
+	else
 		gpio_off((pin / GPIO_REG_SIZE), (pin % GPIO_REG_SIZE));
 
     // printk("data input: %s\n", databuf);
@@ -164,5 +164,5 @@ module_exit(gpio_driver_exit);
 
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("rsrajpal@bu.edu");
-MODULE_DESCRIPTION("Test gpio device drivers for Zynq-7035");
+MODULE_DESCRIPTION("Test gpio device drivers for Zynq-7000 series SoCs");
 MODULE_VERSION("1.0");
