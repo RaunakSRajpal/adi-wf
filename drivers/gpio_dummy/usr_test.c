@@ -6,11 +6,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-static  xgpio_readreg(int file_desc, char *buf, int pin) {
+void xgpio_readreg(int file_desc, char *buf, int pin) {
     ssize_t nbytes = read(file_desc,buf,sizeof(buf));
-    printf("no. of bytes read: %d\n", nbytes);
-
-    return 
+    // printf("no. of bytes read: %d\n", nbytes);
+    return;
 }
 
 void xgpio_writereg(int file_desc, char *buf, int pin, int value) {
