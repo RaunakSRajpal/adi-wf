@@ -41,7 +41,7 @@ int main() {
         // printf("sw[0]: %s", rd_buffer);
         // xgpio_readreg(fd, rd_buffer, 9);
         // printf("sw[0]: %s", rd_buffer);
-        ret chk = xgpio_writereg(fd, wr_buffer, led, TRUE);
+        ret_chk = xgpio_writereg(fd, wr_buffer, led, TRUE);
         printf("bytes written: %d\n", ret_chk);
         usleep(500000);
         ret_chk = xgpio_writereg(fd, wr_buffer, led, FALSE);
