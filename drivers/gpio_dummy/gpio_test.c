@@ -13,7 +13,7 @@
 // #include <string.h>
 
 /* ---------------- Global variables/macros --------------- */
-#define XGPIOPS_BASE_ADDR       (uint32_t*)0xE000A000
+#define XGPIOPS_BASE_ADDR       0xE000A000
 #define XGPIOPS_DATA__(X)       0x00000040 + (X*4)
 #define XGPIOPS_DATA_RO__(X)    0x00000060 + (X*4)
 #define XGPIOPS_DIRM__(X)       0x00000204 + (X*4 << 1)
@@ -87,15 +87,13 @@ static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size
 
 static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t buf_size, loff_t *offset) {
     printk("GPIO_XOR: Writing to Device\n");
-	int pin;
-	bool value;
-	int ret_val;
 
+	/* buffer overflow */
 	if (buf_size >= PROCFS_BUF_SIZE)
 		buf_size = PROCFS_BUF_SIZE - 1;
 
-    ret_val = copy_from_user(databuf, devbuf, buf_size);
-
+	/* check if device buffer gets successfully passed from user to k-space */
+    int ret_val = copy_from_user(databuf, devbuf, buf_size);
     if (ret_val) {
 		printk("ERROR: buffer overflow: %d\n", ret_val);
 		return -1;
@@ -106,6 +104,8 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 	}
 
 	/* scan and check the buffer entry from user */
+	int pin;
+	bool value;
 	if (sscanf(databuf, "(%d,%d)", &pin, &value) != 2) {
 		printk("ERROR: %s: Inproper data format\n", PROCFS_NAME);
 		return buf_size;
@@ -116,6 +116,7 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 		return buf_size;
 	}
 
+	/* function call to turn on/off gpio pin */
 	if (value)
 		gpio_on((uint32_t)(pin / GPIO_REG_SIZE), (uint32_t)(pin % GPIO_REG_SIZE));
 	else
