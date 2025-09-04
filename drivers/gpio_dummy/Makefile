@@ -1,10 +1,12 @@
 BINARY		:= gpio_test
 KERNEL		:= /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
-SYSROOT := /home/raunak/wise-rsr/sysmod_rootfs/usr/include
+# SYSROOT := /home/raunak/wise-rsr/linux-adi
 
 obj-m += $(BINARY).o
-obj-m += usr_test.o
+# obj-m += usr_test.o
+
+# set(CMAKE_SYSROOT /home/raunak/wise-rsr/linux-adi)
 
 CC		= $(CROSS_COMPILE)gcc
 LD		= $(CROSS_COMPILE)ld
@@ -15,12 +17,12 @@ OBJDUMP		= $(CROSS_COMPILE)objdump
 READELF		= $(CROSS_COMPILE)readelf
 STRIP		= $(CROSS_COMPILE)strip
 
-CFLAGS := --sysroot=$(SYSROOT) -Wall -g
+# CFLAGS := --sysroot=$(SYSROOT) -Wall -g
 # CXXFLAGS := --sysroot=$(SYSROOT) -Wall -g
-LDFLAGS := --sysroot=$(SYSROOT)
+# LDFLAGS := --sysroot=$(SYSROOT)
 
 export CROSS_COMPILE ARCH CC LD AR NM CFLAGS LDFLAGS
-export STRIP READELF OBJCOPY OBJDUMP
+export STRIP READELF OBJCOPY OBJDUMP SYSROOT
 
 all:
 		make -C $(KERNEL) M=$(KMOD_DIR) modules
