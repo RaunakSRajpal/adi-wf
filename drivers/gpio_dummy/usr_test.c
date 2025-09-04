@@ -28,7 +28,8 @@ int main() {
 
     char rd_buffer[1024];
     char wr_buffer[1024];
-    
+    int led = 4;
+
     while (true)
     {
         // xgpio_readreg(fd, rd_buffer, 8);
