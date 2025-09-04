@@ -1,7 +1,7 @@
 BINARY		:= gpio_test
 KERNEL		:= /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
-SYSROOT := /home/raunak/wise-rsr/linux-adi/usr/include
+SYSROOT := /home/raunak/wise-rsr/sysmod_rootfs/usr/include
 
 obj-m += $(BINARY).o
 obj-m += usr_test.o
