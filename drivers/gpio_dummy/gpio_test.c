@@ -10,14 +10,14 @@
 #include <linux/fcntl.h> /* O_ACCMODE */
 
 #include <asm/io.h>
-#include <string.h>
+// #include <string.h>
 
 /* ---------------- Global variables/macros --------------- */
 #define XGPIOPS_BASE_ADDR       (uint32_t*)0xE000A000
-#define XGPIOPS_DATA__(X)       (uint32_t*)0x00000040 + (X*4)
-#define XGPIOPS_DATA_RO__(X)    (uint32_t*)0x00000060 + (X*4)
-#define XGPIOPS_DIRM__(X)       (uint32_t*)0x00000204 + (X*4 << 1)
-#define XGPIOPS_OEN__(X)        (uint32_t*)0x00000208 + (X*4 << 1)
+#define XGPIOPS_DATA__(X)       0x00000040 + (X*4)
+#define XGPIOPS_DATA_RO__(X)    0x00000060 + (X*4)
+#define XGPIOPS_DIRM__(X)       0x00000204 + (X*4 << 1)
+#define XGPIOPS_OEN__(X)        0x00000208 + (X*4 << 1)
 
 #define GPIO_PIN_MAX 118
 #define GPIO_REG_SIZE 32
@@ -32,8 +32,8 @@ static char databuf[PROCFS_BUF_SIZE] = {0};
 
 /* ---------------- Function declarations ----------------- */
 
-static int gpio_on(unsigned int pin);
-static int gpio_off(unsigned int pin);
+static void gpio_on(unsigned int bank, unsigned int pin);
+static void gpio_off(unsigned int bank, unsigned int pin);
 /* module functions */
 static int  __init gpio_driver_init(void);
 static void __exit gpio_driver_exit(void);
@@ -56,24 +56,26 @@ static const struct proc_ops gpio_ops = {
 
 /* ----------------- Function definitions ----------------- */
 
-static int gpio_on(unsigned int bank, unsigned int pin) {
-    unsigned int *dirm_x = gpio_registers + (uint32_t*)XGPIOPS_DIRM__(bank);
-    unsigned int *oen_x  = gpio_registers + (uint32_t*)XGPIOPS_OEN__(bank);
-    unsigned int *data_x = gpio_registers + (uint32_t*)XGPIOPS_DATA_RO__(bank);
+static void gpio_on(unsigned int bank, unsigned int pin) {
+    unsigned int *dirm_x = gpio_registers + XGPIOPS_DIRM__(bank);
+    unsigned int *oen_x  = gpio_registers + XGPIOPS_OEN__(bank);
+    unsigned int *data_x = gpio_registers + XGPIOPS_DATA__(bank);
     // REG - OPS
     *dirm_x |= (1 << pin);
     *oen_x |= (1 << pin);
     *data_x |= (1 << pin);
+    return;
 }
 
-static int gpio_off(unsigned int bank, unsigned int pin) {
-    unsigned int *dirm_x = gpio_registers + (uint32_t*)XGPIOPS_DIRM__(bank);
-    unsigned int *oen_x  = gpio_registers + (uint32_t*)XGPIOPS_OEN__(bank);
-    unsigned int *data_x = gpio_registers + (uint32_t*)XGPIOPS_DATA_RO__(bank);
+static void gpio_off(unsigned int bank, unsigned int pin) {
+    unsigned int *dirm_x = gpio_registers + XGPIOPS_DIRM__(bank);
+    unsigned int *oen_x  = gpio_registers + XGPIOPS_OEN__(bank);
+    unsigned int *data_x = gpio_registers + XGPIOPS_DATA__(bank);
     // REG - OPS
     *dirm_x |= (1 << pin);
     *oen_x |= (1 << pin);
     *data_x &= ~(1 << pin);
+    return;
 }
 
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset) {
@@ -110,14 +112,14 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 	}
 
 	if (pin > GPIO_PIN_MAX - 1) {
-		printk("ERROR: %s: Undefined pin value", PROCFS_NAME)
+		printk("ERROR: %s: Undefined pin value", PROCFS_NAME);
 		return buf_size;
 	}
 
 	if (value)
-		gpio_on((pin / GPIO_REG_SIZE), (pin % GPIO_REG_SIZE));
+		gpio_on((uint32_t)(pin / GPIO_REG_SIZE), (uint32_t)(pin % GPIO_REG_SIZE));
 	else
-		gpio_off((pin / GPIO_REG_SIZE), (pin % GPIO_REG_SIZE));
+		gpio_off((uint32_t)(pin / GPIO_REG_SIZE), (uint32_t)(pin % GPIO_REG_SIZE));
 
     // printk("data input: %s\n", databuf);
 
