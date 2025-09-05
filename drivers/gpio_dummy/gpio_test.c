@@ -27,7 +27,7 @@
 static uint32_t *gpio_registers = NULL;
 static struct proc_dir_entry *gpio_proc = NULL;
 static char databuf[PROCFS_BUFMAX_SIZE];
-static unsigned long databuf_size = 0;
+static ssize_t databuf_size = 0;
 
 /********************************************************** */
 
@@ -103,10 +103,10 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 
 	databuf[databuf_size] = '\0';
 	*offset += databuf_size;
-	printk("%s: writing %d bytes to kernel buffer\n", PROCFS_NAME, databuf_size);
+	printk("%s: writing %ld bytes to kernel buffer\n", PROCFS_NAME, databuf_size);
 	
 	/* scan and check the buffer entry from user */
-	int pin;	bool value;
+	int pin, value;
 	if (sscanf(databuf, "(%d,%d)", &pin, &value) != 2) {
 		printk("ERROR: %s: Inproper data format\n", PROCFS_NAME);
 		return databuf_size;
