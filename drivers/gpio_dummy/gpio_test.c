@@ -79,11 +79,47 @@ static void gpio_off(unsigned int bank, unsigned int pin) {
     return;
 }
 
+static int gpio_reg_read(unsigned int bank, unsigned int pin) {
+	uint32_t *dirm_x 	= (uint32_t*)(gpio_registers + XGPIOPS_DIRM__(bank));
+    uint32_t *oen_x  	= (uint32_t*)(gpio_registers + XGPIOPS_OEN__(bank));
+    uint32_t *data_ro_x = (uint32_t*)(gpio_registers + XGPIOPS_DATA_RO__(bank));
+	// REG - OPS
+	*dirm_x &= ~(1 << pin);
+    *oen_x &= ~(1 << pin);
+	return *data_ro_x & (1 << pin);
+}
+
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset) {
     printk("GPIO_XOR: Reading Device\n");
-	// sprintf("", );
+	int pin, bank, value;
+	char buf;
 
-    return (*offset || copy_to_user(devbuf, "Welcome!", 8)) ? 0 : 8;
+	/* set pin, bank values for MIO/EMIO */
+	if (pin >= GPIO_PIN_MAX) {
+		printk("ERROR: %s: Undefined pin value", PROCFS_NAME);
+		return databuf_size;
+	} else if (pin > 0 && pin < 54)	{
+		pin = pin % (GPIO_REG_SIZE * 8);
+		bank = pin / (GPIO_REG_SIZE * 8);
+	} else if (pin >= 54) {
+		pin = (pin - 54) % (GPIO_REG_SIZE * 8);
+		bank = 2 + (pin - 54) / (GPIO_REG_SIZE * 8);
+	}
+
+	/* read gpio register and pass to user buffer */
+	value = gpio_reg_read(bank,pin);
+	if (value)	buf = "1";
+	else		buf = "0";
+	int len = sizeof(buf);
+
+	if (*offset >= len || copy_to_user(devbuf, buf, len)) {
+		pr_alert("copy buffer to user space failed\n");
+		return 0;
+	}
+	pr_info("%s: read process: %s\n", PROCFS_NAME, file->f_path.dentry->d_name.name);
+	*offset += len;
+
+    return len;
 }
 
 static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t buf_size, loff_t *offset) {
@@ -111,7 +147,6 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 		printk("ERROR: %s: Inproper data format\n", PROCFS_NAME);
 		return databuf_size;
 	}
-	printk("rx: %d,%d\n", pin, value);
 
 	/* set pin, bank values for MIO/EMIO */
 	if (pin >= GPIO_PIN_MAX) {
@@ -130,7 +165,7 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 	else		gpio_off((uint32_t)bank, (uint32_t)pin);
 
     // printk("data input: %s\n", databuf);
-    return buf_size;
+    return databuf_size;
 }
 
 static int __init gpio_driver_init(void) {
