@@ -15,9 +15,13 @@ ssize_t xgpio_readreg(int file_desc, char *buf, int pin) {
     char *buf_o;
     sprintf(buf_o, "|%d:", pin);
     ssize_t nbytes_o = write(file_desc,buf_o,sizeof(buf_o));
+    if (nbytes_o <= 0) {
+        printf("fildes %d: failed to send pin to kernel\n");
+    }
+    
     ssize_t nbytes_i = read(file_desc,buf,sizeof(buf));
     // printf("no. of bytes read: %d\n", nbytes);
-    return nbytes;
+    return nbytes_i;
 }
 
 ssize_t xgpio_writereg(int file_desc, char *buf, int pin, int value) {
