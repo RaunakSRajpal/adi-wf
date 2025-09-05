@@ -28,6 +28,8 @@ static volatile void __iomem *gpio_registers = NULL;
 static struct proc_dir_entry *gpio_proc = NULL;
 static char databuf[PROCFS_BUFMAX_SIZE];
 static unsigned long databuf_size = 0;
+static int pin_io = 1;
+static int pin;
 
 /********************************************************** */
 
@@ -91,7 +93,7 @@ static int gpio_reg_read(unsigned int bank, unsigned int pin) {
 
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset) {
     printk("GPIO_XOR: Reading Device\n");
-	int pin, bank, value;
+	int bank, value;
 	char buf;
 
 	/* set pin, bank values for MIO/EMIO */
@@ -142,12 +144,16 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 	printk("%s: writing %ld bytes to kernel buffer: %s\n", PROCFS_NAME, databuf_size, databuf);
 	
 	/* scan and check the buffer entry from user */
-	int pin, bank, value;
+	int bank, value;
 	if (sscanf(databuf, "(%d,%d)", &pin, &value) != 2) {
-		printk("ERROR: %s: Inproper data format\n", PROCFS_NAME);
-		return databuf_size;
+	    if (sscanf(databuf, "|%d:", &pin) != 2) {
+	        printk("ERROR: %s: Inproper data format\n", PROCFS_NAME);
+		    return databuf_size;
+	    }
+	    pin_io = 0;
 	}
 
+    if (pin_io) {
 	/* set pin, bank values for MIO/EMIO */
 	if (pin >= GPIO_PIN_MAX) {
 		printk("ERROR: %s: Undefined pin value", PROCFS_NAME);
@@ -163,6 +169,7 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 	/* function call to turn on/off gpio pin */
 	if (value)	gpio_on((uint32_t)bank, (uint32_t)pin);
 	else		gpio_off((uint32_t)bank, (uint32_t)pin);
+	}
 
     // printk("data input: %s\n", databuf);
     return databuf_size;
