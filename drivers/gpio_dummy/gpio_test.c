@@ -111,6 +111,7 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 		printk("ERROR: %s: Inproper data format\n", PROCFS_NAME);
 		return databuf_size;
 	}
+	printk("rx: %d,%d\n", pin, value);
 
 	if (pin >= GPIO_PIN_MAX) {
 		printk("ERROR: %s: Undefined pin value", PROCFS_NAME);
