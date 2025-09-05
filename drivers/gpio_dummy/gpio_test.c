@@ -103,7 +103,7 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 
 	databuf[databuf_size] = '\0';
 	*offset += databuf_size;
-	printk("%s: writing %ld bytes to kernel buffer\n", PROCFS_NAME, databuf_size);
+	printk("%s: writing %ld bytes to kernel buffer: %s\n", PROCFS_NAME, databuf_size, databuf);
 	
 	/* scan and check the buffer entry from user */
 	int pin, value;
