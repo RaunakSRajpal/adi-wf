@@ -27,7 +27,7 @@
 static uint32_t *gpio_registers = NULL;
 static struct proc_dir_entry *gpio_proc = NULL;
 static char databuf[PROCFS_BUFMAX_SIZE];
-static unsigned int databuf_size = 0;
+static unsigned long databuf_size = 0;
 
 /********************************************************** */
 
