@@ -17,6 +17,7 @@ ssize_t xgpio_readreg(int file_desc, char *buf, int pin) {
 
 ssize_t xgpio_writereg(int file_desc, char *buf, int pin, int value) {
     sprintf(buf, "(%d,%d)", pin, value);
+    printf("buffer size: %d\n", sizeof(buf));
     ssize_t nbytes = write(file_desc,buf,sizeof(buf));
     return nbytes;
 }
