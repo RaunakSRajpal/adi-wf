@@ -9,6 +9,8 @@
 #define TRUE 1
 #define FALSE 0
 
+#define EMIO_BASE 54
+
 ssize_t xgpio_readreg(int file_desc, char *buf, int pin) {
     ssize_t nbytes = read(file_desc,buf,sizeof(buf));
     // printf("no. of bytes read: %d\n", nbytes);
@@ -33,7 +35,7 @@ int main() {
     char rd_buffer[1024];
     char wr_buffer[1024];
     
-    int led = 4;
+    int led = 4 + EMIO_BASE;
     ssize_t ret_chk;
 
     while (TRUE)
