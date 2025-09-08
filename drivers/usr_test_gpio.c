@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "gpio_dummy/gpiodev.h"
+
 #define TRUE 1
 #define FALSE 0
 
