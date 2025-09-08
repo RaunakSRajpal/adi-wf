@@ -26,7 +26,7 @@ ssize_t xgpio_readreg(int file_desc, char *buf, int pin) {
 
 ssize_t xgpio_writereg(int file_desc, char *buf, int pin, int value) {
     //snprintf(buf, sizeof(buf), "(%d,%d)", pin, value);
-    sprintf(buf, "(%d,%d)", pin, value);
+    sprintf(buf, "(%d,%d)\0", pin, value);
     //char t_buf0[5], t_buf1[2];
     //sprintf(t_buf0, "%d", pin);
     //sprintf(t_buf1, "%d", value);
@@ -39,7 +39,7 @@ ssize_t xgpio_writereg(int file_desc, char *buf, int pin, int value) {
     //strcat(buf, t_buf1);
     //strcat(buf, ")");
     printf("%s: buffer size: %d\n", buf, strlen(buf));
-    ssize_t nbytes = write(file_desc,buf,strlen(buf)-1);
+    ssize_t nbytes = write(file_desc,buf,strlen(buf));
     return nbytes;
 }
 
