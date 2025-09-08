@@ -24,7 +24,7 @@
 #define GPIO_REG_SIZE 4
 #define MAJOR_NUM 100
  
-#define IOCTL_SET_PIN _IOWR(MAJOR_NUM, 2, int)
+#define IOCTL_GET_PIN _IOWR(MAJOR_NUM, 2, int)
 
 #define DEVICE_NAME "gpio_driver_ioctl"
 #define DEVFS_BUFMAX_SIZE 1024
