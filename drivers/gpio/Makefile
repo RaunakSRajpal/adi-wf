@@ -1,4 +1,4 @@
-BINARY		:= gpio_test
+BINARY		:= pl_gpio
 KERNEL		:= /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
 
