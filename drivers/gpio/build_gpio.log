@@ -1,0 +1,3 @@
+make -C /home/raunak/wise-rsr/linux-adi M=/home/raunak/wise-rsr/drivers/gpio modules
+make[1]: Entering directory '/home/raunak/wise-rsr/linux-adi'
+make[1]: Leaving directory '/home/raunak/wise-rsr/linux-adi'

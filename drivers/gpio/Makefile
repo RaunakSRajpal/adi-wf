@@ -1,8 +1,9 @@
-BINARY		:= pl_gpio
+BINARY		:= pl_gpio_main
 KERNEL		:= /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
 
 obj-m += $(BINARY).o
+$(BINARY)-objs := gpio_ops.o pl_gpio.o
 
 CC		= $(CROSS_COMPILE)gcc
 LD		= $(CROSS_COMPILE)ld

@@ -12,17 +12,18 @@
 
 #include "gpio_ioctl.h"
 #include "gpio_ops.h"
+#include "gpio_ops.c"
 
 #define DRV_NAME "gpio-pl"
 
 /* ---------------- File-Operation declarations ----------------- */
 
 /* device file-ops functions */
-static size_t gpio_open(struct inode *inode, struct file *file);
-static size_t gpio_release(struct inode *inode, struct file *file);
+static int gpio_open(struct inode *inode, struct file *file);
+static int gpio_release(struct inode *inode, struct file *file);
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset);
 static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t buf_size, loff_t *offset);
-static ssize_t gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
+static long gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
 
 static const struct file_operations gpio_ops = {
     .open    =   gpio_open,
@@ -32,6 +33,8 @@ static const struct file_operations gpio_ops = {
 	.unlocked_ioctl = gpio_ioctl
 };
 
+static struct class *cls;
+
 
 
 static uint32_t getPinVal(unsigned int pin) {
@@ -40,7 +43,7 @@ static uint32_t getPinVal(unsigned int pin) {
     /* set pin, bank values for MIO/EMIO */
 	if (pin >= GPIO_PIN_MAX) {
 		printk("ERROR: %s: Undefined pin value", DRV_NAME);
-		return databuf_size;
+		return -1;
 	} else if (pin > 0 && pin < 54)	{
 		pin = pin % (GPIO_REG_SIZE * 8);
 		bank = pin / (GPIO_REG_SIZE * 8);
@@ -52,13 +55,13 @@ static uint32_t getPinVal(unsigned int pin) {
     return gpio_pin_rd(bank,pin);
 }
 
-static void setPinVal(unsigned int pin, unsigned int val) {
+static int setPinVal(unsigned int pin, unsigned int val) {
     unsigned int bank;
 
     /* set pin, bank values for MIO/EMIO */
 	if (pin >= GPIO_PIN_MAX) {
 		printk("ERROR: %s: Undefined pin value", DRV_NAME);
-		return databuf_size;
+		return -1;
 	} else if (pin > 0 && pin < 54)	{
 		pin = pin % (GPIO_REG_SIZE * 8);
 		bank = pin / (GPIO_REG_SIZE * 8);
@@ -68,18 +71,18 @@ static void setPinVal(unsigned int pin, unsigned int val) {
 	}
 
     gpio_pin_wr(bank,pin,val);
-    return;
+    return 0;
 }
 
 
-static size_t gpio_open(struct inode *inode, struct file *file) {
-    pr_info("%s: Major: %d Minor: %d \t filep->f_pos: %lld\n", DRV_NAME, imajor(inode), iminor(inode), filep->f_pos);
-    pr_info("%s: device file mode: 0x%x \t flags: 0x%x\n", DRV_NAME, filep->f_mode);
+static int gpio_open(struct inode *inode, struct file *file) {
+    pr_info("%s: Major: %d Minor: %d \t file->f_pos: %lld\n", DRV_NAME, imajor(inode), iminor(inode), file->f_pos);
+    pr_info("%s: device file mode: 0x%x \t flags: 0x%x\n", DRV_NAME, file->f_mode);
 
     return 0;
 }
 
-static size_t gpio_release(struct inode *inode, struct file *file) {
+static int gpio_release(struct inode *inode, struct file *file) {
     pr_info("%s: device file closed\n", DRV_NAME);
     return 0;
 }
@@ -87,25 +90,26 @@ static size_t gpio_release(struct inode *inode, struct file *file) {
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset) {
     /* buffer overflow */
     unsigned int databuf_size;
-
+    // TODO: initialise databuf_size
     if (databuf_size >= DEVFS_BUFMAX_SIZE)
 		databuf_size = DEVFS_BUFMAX_SIZE - 1;
     
     pr_info("%s: Reading from device file %s:\t%s\n", DRV_NAME, DEVICE_FILE_NAME, DEVICE_PATH);
     
-    int retval = copy_to_user(devbuf, buf, databuf_size);
-	if (*offset >= databuf_size || retval) {
-		pr_alert("copy buffer to user space failed with %d\n", retval);
-		return 0;
-	}
+    /* TODO:
+     * fix: the read function
+     ***/
+    // int retval = copy_to_user(devbuf, buf, databuf_size);
+	// if (*offset >= databuf_size || retval) {
+	//     pr_alert("copy buffer to user space failed with %d\n", retval);
+    //     return 0;
+	// }
 
-    databuf[databuf_size] = '\0';
-    *offset += databuf_size;
-    pr_info("%s: reading %ld bytes to kernel buffer: %s\n", DEVICE_NAME, databuf_size, databuf);
+    // databuf[databuf_size] = '\0';
+    // *offset += databuf_size;
+    // pr_info("%s: reading %ld bytes to kernel buffer: %s\n", DEVICE_NAME, databuf_size, databuf);
 
-    // perfrom the read function
-
-    return str_len;
+    return databuf_size;
 }
 
 static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t buf_size, loff_t *offset) {
@@ -116,26 +120,30 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 
     pr_info("%s: Writinging to device file %s:\t%s\n", DRV_NAME, DEVICE_FILE_NAME, DEVICE_PATH);
     
+    /* TODO:
+     * fix: the write function
+     ***/
     /* check if device buffer gets successfully passed from user to k-space */
-    int ret_val = copy_from_user(databuf, (uint32_t *)devbuf, databuf_size);
-    if (ret_val) {
-		pr_alert("ERROR: buffer overflow: %d bytes failed\n", ret_val);
-		return -1;
-	}
+    // int ret_val = copy_from_user(databuf, (uint32_t *)devbuf, databuf_size);
+    // if (ret_val) {
+    //     pr_alert("ERROR: buffer overflow: %d bytes failed\n", ret_val);
+    //     return -1;
+	// }
 
-	databuf[databuf_size] = '\0';
-	*offset += databuf_size;
-    pr_info("%s: writing %ld bytes to kernel buffer: %s\n", DEVICE_NAME, databuf_size, databuf);
+	// databuf[databuf_size] = '\0';
+	// *offset += databuf_size;
+    // pr_info("%s: writing %ld bytes to kernel buffer: %s\n", DRV_NAME, databuf_size, databuf);
 
     return databuf_size;
 }
 
-static ssize_t gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
+static long gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
     struct gpio_ioctl databuf;
     unsigned int databuf_size = sizeof(databuf);
 
     switch (cmd)
     {
+        int ret_val;
         case RD_DEV:
             // gpio_read(file, );
             break;
@@ -145,29 +153,39 @@ static ssize_t gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg
             break;
 
         case GET_PIN:
-            int ret_val = copy_from_user(&databuf, (struct gpio_ioctl *)arg, databuf_size);
+            ret_val = copy_from_user(&databuf, (struct gpio_ioctl *)arg, databuf_size);
             if (ret_val) {
 	        	pr_alert("ERROR: %s: buffer overflow: %d bytes failed\n", DRV_NAME, ret_val);
 	        	return -1;
 	        }
 
-            return getPinVal(&databuf.pin);
-            break;
+            ret_val = getPinVal(&databuf.pin);
+            if (ret_val < 0) {
+                pr_alert("ERROR: %s: Undefined pin value\n", DRV_NAME);
+            }
+            
+            return ret_val;
         
         case SET_PIN:
-            int ret_val = copy_from_user(&databuf, (struct gpio_ioctl *)arg, databuf_size);
+            ret_val = copy_from_user(&databuf, (struct gpio_ioctl *)arg, databuf_size);
             if (ret_val) {
 	        	pr_alert("ERROR: %s: buffer overflow: %d bytes failed\n", DRV_NAME, ret_val);
 	        	return -1;
 	        }
-
-            return setPinVal(&databuf.pin, &databuf.data);
-            break;
+	        
+	        ret_val = setPinVal(&databuf.pin, &databuf.data);
+	        if (ret_val < 0) {
+	            pr_alert("ERROR: %s: Undefined pin value\n", DRV_NAME);
+	        }
+	        
+            return ret_val;
     
         default:
-            pr_alert("%s: Invalid i/o control signal. Aborting device operation\n", DRV_NAME);
-            break;
+            pr_err("%s: Invalid i/o control signal. Aborting device operation\n", DRV_NAME);
+            return -1;
     }
+    
+    return databuf_size;
 }
 
 
@@ -178,9 +196,9 @@ static int  __init gpio_driver_init(void) {
 
     /* Register the character device (at least try) */
     int ret_val = register_chrdev(MAJOR_NUM, DRV_NAME, &gpio_ops);
-    if (ret_val== NULL) {
-		pr_error("ERROR: %s: Failed to initialize char device\n", DRV_NAME);
-	    return -ENOMEM;
+    if (ret_val < 0) {
+		pr_err("ERROR: %s: Failed to initialize char device\n", DRV_NAME);
+	    return ret_val;
 	}
 
     pr_info("%s: device %s registered succesfully at %s\n", DRV_NAME, DEVICE_FILE_NAME, DEVICE_PATH);
@@ -231,3 +249,4 @@ MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("rsrajpal@bu.edu");
 MODULE_DESCRIPTION("Test gpio device drivers for Zynq-7000 series SoCs");
 MODULE_VERSION("1.0");
+
