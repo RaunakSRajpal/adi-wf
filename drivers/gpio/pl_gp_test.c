@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <linux/ioctl.h>
 #include "gpio_ioctl.h"
 
 #define TRUE 1
