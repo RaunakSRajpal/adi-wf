@@ -30,7 +30,7 @@ source /opt/Xilinx/Vitis/2024.2/settings64.sh
     rm -rf $MNT_PT/BOOT/devicetree.dtb
     cp -f $WS/uImage $MNT_PT/BOOT
     cp -f $WS/$EVAL_BD $MNT_PT/BOOT/
-    mv -b $MNT_PT/BOOT/$EVAL_BD $MNT_PT/BOOT/$EVAL_BD
+    mv -b $MNT_PT/BOOT/$EVAL_BD $MNT_PT/BOOT/devicetree.dtb
 )
 
 ## rootfs

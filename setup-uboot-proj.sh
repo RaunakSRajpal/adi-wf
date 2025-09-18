@@ -172,3 +172,4 @@ CONFIG_GEN_FILE=${4:-"zynq_xcomm_adv7511_defconfig"}
     cp -f arch/arm/boot/dts/$DTFILE ../
     echo "boot files generated: $IMG_NAME $DTFILE"
 
+
