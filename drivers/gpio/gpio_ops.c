@@ -3,7 +3,9 @@
 
 #include "gpio_ops.h"
 
-static uint32_t gpio_pin_rd(uint8_t bank, uint8_t pin) {
+static volatile void __iomem *gpio_registers = NULL;
+
+uint32_t gpio_pin_rd(uint8_t bank, uint8_t pin) {
     uint32_t *dirm_x 	= (uint32_t*)(gpio_registers + XGPIOPS_DIRM__(bank));
     uint32_t *oen_x  	= (uint32_t*)(gpio_registers + XGPIOPS_OEN__(bank));
     uint32_t *data_ro_x = (uint32_t*)(gpio_registers + XGPIOPS_DATA_RO__(bank));
@@ -14,7 +16,7 @@ static uint32_t gpio_pin_rd(uint8_t bank, uint8_t pin) {
 	return *data_ro_x & (1 << pin);
 }
 
-static void gpio_pin_wr(uint8_t bank, uint8_t pin, uint8_t val) {
+void gpio_pin_wr(uint8_t bank, uint8_t pin, uint8_t val) {
     uint32_t *dirm_x = (uint32_t*)(gpio_registers + XGPIOPS_DIRM__(bank));
     uint32_t *oen_x  = (uint32_t*)(gpio_registers + XGPIOPS_OEN__(bank));
     uint32_t *data_x = (uint32_t*)(gpio_registers + XGPIOPS_DATA__(bank));
@@ -26,7 +28,29 @@ static void gpio_pin_wr(uint8_t bank, uint8_t pin, uint8_t val) {
         *data_x |= (1 << pin);
     else 
         *data_x &= ~(1 << pin);
+    printk("basereg: %x bank: %d pin: %d val: %d\n", gpio_registers, bank, pin, val); 
+    printk("reg: %x %x %x\n", dirm_x, oen_x, data_x);
+    printk("reg: %x %x %x\n", *dirm_x, *oen_x, *data_x);
     
+    return;
+}
+
+
+int map_gpio_reg(void) {
+    /* define a pointer to map gpio register banks for a full page(?) */
+	gpio_registers = ioremap(XGPIOPS_BASE_ADDR, GPIO_REG_SIZE);
+	if (gpio_registers == NULL) {
+		pr_alert("ERROR: failed to map GPIO memory\n");
+		return -1;
+	}
+	
+	printk("Successfully mapped in GPIO memory\n");
+
+    return 0;
+}
+
+void unmap_gpio_reg(void) {
+    iounmap(gpio_registers);
     return;
 }
 

@@ -1,3 +1,63 @@
 make -C /home/raunak/wise-rsr/linux-adi M=/home/raunak/wise-rsr/drivers/gpio modules
 make[1]: Entering directory '/home/raunak/wise-rsr/linux-adi'
+  CC [M]  /home/raunak/wise-rsr/drivers/gpio/pl_gpio.o
+In file included from /home/raunak/wise-rsr/drivers/gpio/pl_gpio.c:14:
+/home/raunak/wise-rsr/drivers/gpio/gpio_ops.h:32:21: error: expected ';' before 'void'
+   32 | static volatilefbomb void __iomem *gpio_registers = NULL;
+      |                     ^~~~~
+      |                     ;
+In file included from ./include/linux/kernel.h:31,
+                 from /home/raunak/wise-rsr/drivers/gpio/pl_gpio.c:1:
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c: In function 'gpio_open':
+./include/linux/kern_levels.h:5:25: warning: format '%x' expects a matching 'unsigned int' argument [-Wformat=]
+    5 | #define KERN_SOH        "\001"          /* ASCII Start Of Header */
+      |                         ^~~~~~
+./include/linux/printk.h:462:25: note: in definition of macro 'printk_index_wrap'
+  462 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
+      |                         ^~~~
+./include/linux/printk.h:563:9: note: in expansion of macro 'printk'
+  563 |         printk(KERN_INFO pr_fmt(fmt), ##__VA_ARGS__)
+      |         ^~~~~~
+./include/linux/kern_levels.h:14:25: note: in expansion of macro 'KERN_SOH'
+   14 | #define KERN_INFO       KERN_SOH "6"    /* informational */
+      |                         ^~~~~~~~
+./include/linux/printk.h:563:16: note: in expansion of macro 'KERN_INFO'
+  563 |         printk(KERN_INFO pr_fmt(fmt), ##__VA_ARGS__)
+      |                ^~~~~~~~~
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c:82:5: note: in expansion of macro 'pr_info'
+   82 |     pr_info("%s: device file mode: 0x%x \t flags: 0x%x\n", DRV_NAME, file->f_mode);
+      |     ^~~~~~~
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c: In function 'gpio_ioctl':
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c:164:33: warning: passing argument 1 of 'getPinVal' makes integer from pointer without a cast [-Wint-conversion]
+  164 |             ret_val = getPinVal(&databuf.pin);
+      |                                 ^~~~~~~~~~~~
+      |                                 |
+      |                                 uint8_t * {aka unsigned char *}
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c:40:40: note: expected 'unsigned int' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   40 | static uint32_t getPinVal(unsigned int pin) {
+      |                           ~~~~~~~~~~~~~^~~
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c:178:37: warning: passing argument 1 of 'setPinVal' makes integer from pointer without a cast [-Wint-conversion]
+  178 |                 ret_val = setPinVal(&databuf.pin, &databuf.data);
+      |                                     ^~~~~~~~~~~~
+      |                                     |
+      |                                     uint8_t * {aka unsigned char *}
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c:59:35: note: expected 'unsigned int' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   59 | static int setPinVal(unsigned int pin, unsigned int val) {
+      |                      ~~~~~~~~~~~~~^~~
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c:178:51: warning: passing argument 2 of 'setPinVal' makes integer from pointer without a cast [-Wint-conversion]
+  178 |                 ret_val = setPinVal(&databuf.pin, &databuf.data);
+      |                                                   ^~~~~~~~~~~~~
+      |                                                   |
+      |                                                   uint8_t * {aka unsigned char *}
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c:59:53: note: expected 'unsigned int' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   59 | static int setPinVal(unsigned int pin, unsigned int val) {
+      |                                        ~~~~~~~~~~~~~^~~
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c: In function 'gpio_driver_init':
+/home/raunak/wise-rsr/drivers/gpio/pl_gpio.c:197:11: warning: unused variable 'gp_dev' [-Wunused-variable]
+  197 |     dev_t gp_dev;
+      |           ^~~~~~
+make[3]: *** [scripts/Makefile.build:229: /home/raunak/wise-rsr/drivers/gpio/pl_gpio.o] Error 1
+make[2]: *** [/home/raunak/wise-rsr/linux-adi/Makefile:1936: /home/raunak/wise-rsr/drivers/gpio] Error 2
+make[1]: *** [Makefile:224: __sub-make] Error 2
 make[1]: Leaving directory '/home/raunak/wise-rsr/linux-adi'
+make: *** [Makefile:32: all] Error 2

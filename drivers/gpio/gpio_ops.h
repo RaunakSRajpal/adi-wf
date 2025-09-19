@@ -29,28 +29,10 @@
 #define XGPIOPS_DIRM__(X)       (uint32_t)0x00000204 + (X*4 << 1)
 #define XGPIOPS_OEN__(X)        (uint32_t)0x00000208 + (X*4 << 1)
 
-static volatile void __iomem *gpio_registers = NULL;
-
-
-static uint32_t gpio_pin_rd(uint8_t bank, uint8_t pin);
-static void gpio_pin_wr(uint8_t bank, uint8_t pin, uint8_t val);
-
-static inline int map_gpio_reg(void) {
-    /* define a pointer to map gpio register banks for a full page(?) */
-	gpio_registers = ioremap(XGPIOPS_BASE_ADDR, GPIO_REG_SIZE);
-	if (gpio_registers == NULL) {
-		pr_alert("ERROR: failed to map GPIO memory\n");
-		return -1;
-	}
-	
-	printk("Successfully mapped in GPIO memory\n");
-
-    return 0;
-}
-
-static inline void unmap_gpio_reg(void) {
-    iounmap(gpio_registers);
-    return;
-}
+uint32_t gpio_pin_rd(uint8_t bank, uint8_t pin);
+void gpio_pin_wr(uint8_t bank, uint8_t pin, uint8_t val);
+int map_gpio_reg(void);
+void unmap_gpio_reg(void);
 
 #endif
+

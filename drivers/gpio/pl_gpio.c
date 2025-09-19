@@ -12,7 +12,7 @@
 
 #include "gpio_ioctl.h"
 #include "gpio_ops.h"
-#include "gpio_ops.c"
+//#include "gpio_ops.c"
 
 #define DRV_NAME "gpio-pl"
 
@@ -41,6 +41,7 @@ static uint32_t getPinVal(unsigned int pin) {
     unsigned int bank;
 
     /* set pin, bank values for MIO/EMIO */
+    printk("pin num rx: %d\n", pin);
 	if (pin >= GPIO_PIN_MAX) {
 		printk("ERROR: %s: Undefined pin value", DRV_NAME);
 		return -1;
@@ -59,8 +60,9 @@ static int setPinVal(unsigned int pin, unsigned int val) {
     unsigned int bank;
 
     /* set pin, bank values for MIO/EMIO */
+    printk("pin num rx: %d\n", pin);
 	if (pin >= GPIO_PIN_MAX) {
-		printk("ERROR: %s: Undefined pin value", DRV_NAME);
+		printk("ERROR: %s: Undefined pin value: (%d,%d)", DRV_NAME, pin, val);
 		return -1;
 	} else if (pin > 0 && pin < 54)	{
 		pin = pin % (GPIO_REG_SIZE * 8);
@@ -89,7 +91,7 @@ static int gpio_release(struct inode *inode, struct file *file) {
 
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset) {
     /* buffer overflow */
-    unsigned int databuf_size;
+    unsigned int databuf_size = 0;
     // TODO: initialise databuf_size
     if (databuf_size >= DEVFS_BUFMAX_SIZE)
 		databuf_size = DEVFS_BUFMAX_SIZE - 1;
@@ -158,8 +160,10 @@ static long gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 	        	pr_alert("ERROR: %s: buffer overflow: %d bytes failed\n", DRV_NAME, ret_val);
 	        	return -1;
 	        }
+	        
+	        pr_info("databuf->pin,val: %d,%d\n", databuf.pin, databuf.data);
 
-            ret_val = getPinVal(&databuf.pin);
+            ret_val = getPinVal(databuf.pin);
             if (ret_val < 0) {
                 pr_alert("ERROR: %s: Undefined pin value\n", DRV_NAME);
             }
@@ -173,9 +177,11 @@ static long gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 	        	return -1;
 	        }
 	        
-	        ret_val = setPinVal(&databuf.pin, &databuf.data);
+	        pr_info("INFO: %s: databuf->pin,val: %d,%d\n", DRV_NAME, databuf.pin, databuf.data);
+	        
+	        ret_val = setPinVal(databuf.pin, databuf.data);
 	        if (ret_val < 0) {
-	            pr_alert("ERROR: %s: Undefined pin value\n", DRV_NAME);
+	            pr_alert("ERROR: %s: Undefined pin value2: %d\n", DRV_NAME, ret_val);
 	        }
 	        
             return ret_val;
@@ -192,7 +198,7 @@ static long gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 static int  __init gpio_driver_init(void) {
     printk("%s: initialising driver...\n", DRV_NAME);
 
-    dev_t gp_dev;
+    // dev_t gp_dev;
 
     /* Register the character device (at least try) */
     int ret_val = register_chrdev(MAJOR_NUM, DRV_NAME, &gpio_ops);
@@ -203,10 +209,10 @@ static int  __init gpio_driver_init(void) {
 
     pr_info("%s: device %s registered succesfully at %s\n", DRV_NAME, DEVICE_FILE_NAME, DEVICE_PATH);
 
-    cls = class_create(DEVICE_FILE_NAME);
+    cls = class_create(DRV_NAME);
     device_create(cls, NULL, MKDEV(MAJOR_NUM, 0), NULL, DEVICE_FILE_NAME);                                                           
 
-    // /* create an entry in the sys-fs */
+    /* create an entry in the sys-fs */
 	// int dev_chk = alloc_chrdev_region(&dev, 0, dev_count, DRV_NAME);
 	// if (dev_chk == NULL) {
 	// 	pr_error("ERROR: %s: Failed to initialize char device\n", DRV_NAME);
@@ -221,8 +227,9 @@ static int  __init gpio_driver_init(void) {
 	// 	return -ENOMEM;
 	// }
 
+    printk("%s: ", DRV_NAME);
     map_gpio_reg();
- 
+
     return 0;
 }
 
