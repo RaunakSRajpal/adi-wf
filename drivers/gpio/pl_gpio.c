@@ -56,23 +56,29 @@ static uint32_t getPinVal(unsigned int pin) {
     return gpio_pin_rd(bank,pin);
 }
 
-static int setPinVal(unsigned int pin, unsigned int val) {
-    unsigned int bank;
+static int setPinVal(int pin, int val) {
+    int bank; int check = 0; int bnk =0;
 
     /* set pin, bank values for MIO/EMIO */
     printk("pin num rx: %d\n", pin);
 	if (pin >= GPIO_PIN_MAX) {
+		check = 1;
 		printk("ERROR: %s: Undefined pin value: (%d,%d)", DRV_NAME, pin, val);
 		return -1;
 	} else if (pin > 0 && pin < 54)	{
+		check = 2;
 		pin = pin % (GPIO_REG_SIZE * 8);
 		bank = pin / (GPIO_REG_SIZE * 8);
 	} else if (pin >= 54) {
+		check = 3;
 		pin = (pin - 54) % (GPIO_REG_SIZE * 8);
-		bank = 2 + (pin - 54) / (GPIO_REG_SIZE * 8);
+		bnk = (pin - 54) / (int)(GPIO_REG_SIZE * 8);
+		bank = bnk + 2;
 	}
+	
+	printk("after pincheck: %d, %d, %d, %d, bnk: %d\n", check, bank, pin, val, bnk);
 
-    gpio_pin_wr(bank,pin,val);
+    gpio_pin_wr(bank=2,pin,val);
     return 0;
 }
 
