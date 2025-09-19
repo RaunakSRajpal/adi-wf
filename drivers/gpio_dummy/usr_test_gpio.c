@@ -9,7 +9,7 @@
 #define TRUE 1
 #define FALSE 0
 
-#define EMIO_BASE 54
+#define EMIO_BASE 0 //54
 
 ssize_t xgpio_readreg(int file_desc, char *buf, int pin) {
     ssize_t nbytes = read(file_desc,buf,sizeof(buf));
@@ -42,10 +42,10 @@ int main() {
 
     while (TRUE)
     {
-        xgpio_readreg(fd, rd_buffer, sw0);
-        printf("sw[0]: %s", rd_buffer);
-        xgpio_readreg(fd, rd_buffer, sw1);
-        printf("sw[1]: %s", rd_buffer);
+        // xgpio_readreg(fd, rd_buffer, sw0);
+        // printf("sw[0]: %s", rd_buffer);
+        // xgpio_readreg(fd, rd_buffer, sw1);
+        // printf("sw[1]: %s", rd_buffer);
 
         ret_chk = xgpio_writereg(fd, wr_buffer, led, TRUE);
         printf("bytes written: %d\n", ret_chk);
