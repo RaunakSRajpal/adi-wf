@@ -28,9 +28,6 @@ void gpio_pin_wr(uint8_t bank, uint8_t pin, uint8_t val) {
         *data_x |= (1 << pin);
     else 
         *data_x &= ~(1 << pin);
-    printk("basereg: %x bank: %d pin: %d val: %d\n", gpio_registers, bank, pin, val); 
-    printk("reg: %x %x %x\n", dirm_x, oen_x, data_x);
-    printk("reg: %x %x %x\n", *dirm_x, *oen_x, *data_x);
     
     return;
 }

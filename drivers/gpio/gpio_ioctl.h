@@ -26,8 +26,8 @@ struct gpio_ioctl
 #define SET_PIN _IOW(MAJOR_NUM, 3, struct gpio_ioctl *)
 
 /* The name of the device file */ 
-#define DEVICE_FILE_NAME "gpio_dev"
-#define DEVICE_PATH "/dev/gpio_dev"
+#define DEVICE_FILE_NAME "gpiopl_dev"
+#define DEVICE_PATH "/dev/gpiopl_dev"
 #define DEVFS_BUFMAX_SIZE 1024
 
 #endif

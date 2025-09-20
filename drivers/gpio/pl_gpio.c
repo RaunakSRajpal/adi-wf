@@ -12,7 +12,7 @@
 
 #include "gpio_ioctl.h"
 #include "gpio_ops.h"
-//#include "gpio_ops.c"
+
 
 #define DRV_NAME "gpio-pl"
 
@@ -38,47 +38,39 @@ static struct class *cls;
 
 
 static uint32_t getPinVal(unsigned int pin) {
-    unsigned int bank;
+    int bank;
 
     /* set pin, bank values for MIO/EMIO */
-    printk("pin num rx: %d\n", pin);
 	if (pin >= GPIO_PIN_MAX) {
-		printk("ERROR: %s: Undefined pin value", DRV_NAME);
+		printk("ERROR: %s: Undefined pin value: %d\n", DRV_NAME, pin);
 		return -1;
 	} else if (pin > 0 && pin < 54)	{
-		pin = pin % (GPIO_REG_SIZE * 8);
-		bank = pin / (GPIO_REG_SIZE * 8);
+	    bank = pin / (GPIO_REG_SIZE * 8);
+        pin = pin % (GPIO_REG_SIZE * 8);
 	} else if (pin >= 54) {
-		pin = (pin - 54) % (GPIO_REG_SIZE * 8);
-		bank = 2 + (pin - 54) / (GPIO_REG_SIZE * 8);
+	    bank = 2 + (pin - 54) / (GPIO_REG_SIZE * 8);
+        pin = (pin - 54) % (GPIO_REG_SIZE * 8);
 	}
 
     return gpio_pin_rd(bank,pin);
 }
 
 static int setPinVal(int pin, int val) {
-    int bank; int check = 0; int bnk =0;
+    int bank;
 
     /* set pin, bank values for MIO/EMIO */
-    printk("pin num rx: %d\n", pin);
 	if (pin >= GPIO_PIN_MAX) {
-		check = 1;
-		printk("ERROR: %s: Undefined pin value: (%d,%d)", DRV_NAME, pin, val);
+		printk("ERROR: %s: Undefined pin value: %d\n", DRV_NAME, pin);
 		return -1;
 	} else if (pin > 0 && pin < 54)	{
-		check = 2;
-		pin = pin % (GPIO_REG_SIZE * 8);
 		bank = pin / (GPIO_REG_SIZE * 8);
+		pin = pin % (GPIO_REG_SIZE * 8);
 	} else if (pin >= 54) {
-		check = 3;
+		bank = 2 + (pin - 54) / (int)(GPIO_REG_SIZE * 8);
 		pin = (pin - 54) % (GPIO_REG_SIZE * 8);
-		bnk = (pin - 54) / (int)(GPIO_REG_SIZE * 8);
-		bank = bnk + 2;
 	}
-	
-	printk("after pincheck: %d, %d, %d, %d, bnk: %d\n", check, bank, pin, val, bnk);
 
-    gpio_pin_wr(bank=2,pin,val);
+    gpio_pin_wr(bank,pin,val);
     return 0;
 }
 

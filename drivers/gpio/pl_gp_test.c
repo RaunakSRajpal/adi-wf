@@ -30,7 +30,7 @@
 
 int main() {
 
-    int fd = open("/dev/gpio_dev", O_RDWR);
+    int fd = open("/dev/gpiopl_dev", O_RDWR);
     if (fd < 0) {
         printf("%s: Failed to open file: %d\n", DEVICE_FILE_NAME, fd);
         return 1;
@@ -57,12 +57,12 @@ int main() {
         // xgpio_readreg(fd, rd_buffer, sw1);
         // printf("sw[1]: %s", rd_buffer);
 
-        // printf("gpio_sw[0].pin = %d\n", gpio_sw[0].pin);
-        // ret_chk = ioctl(fd, GET_PIN, &gpio_sw[0]);
-        // printf("gpio read: %d\n", ret_chk);
-        // printf("gpio_sw[1].pin = %d\n", gpio_sw[1].pin);
-        // ret_chk = ioctl(fd, GET_PIN, &gpio_sw[1]);
-        // printf("gpio read: %d\n", ret_chk);
+        printf("gpio_sw[0].pin = %d\n", gpio_sw[0].pin);
+        ret_chk = ioctl(fd, GET_PIN, &gpio_sw[0]);
+        printf("gpio read: %d\n", ret_chk);
+        printf("gpio_sw[1].pin = %d\n", gpio_sw[1].pin);
+        ret_chk = ioctl(fd, GET_PIN, &gpio_sw[1]);
+        printf("gpio read: %d\n", ret_chk);
 
         gpio_led.data = TRUE;
         ret_chk = ioctl(fd, SET_PIN, &gpio_led);
