@@ -40,15 +40,17 @@ int main() {
     char wr_buffer[1024];
     
     int led = 4 + EMIO_BASE;
-    int sw0 = 8 + EMIO_BASE;
-    int sw1 = 9 + EMIO_BASE;
+    int sw0 = 10 + EMIO_BASE;
+    int sw1 = 11 + EMIO_BASE;
     long ret_chk;
 
     struct gpio_ioctl gpio_sw[2];
     struct gpio_ioctl gpio_led;
+    struct gpio_ioctl gpio_xor;
     gpio_sw[0].pin = sw0;
     gpio_sw[1].pin = sw1;
     gpio_led.pin = led;
+    gpio_xor.pin = -1;
 
     while (TRUE)
     {
@@ -57,21 +59,31 @@ int main() {
         // xgpio_readreg(fd, rd_buffer, sw1);
         // printf("sw[1]: %s", rd_buffer);
 
-        printf("gpio_sw[0].pin = %d\n", gpio_sw[0].pin);
-        ret_chk = ioctl(fd, GET_PIN, &gpio_sw[0]);
-        printf("gpio read: %d\n", ret_chk);
-        printf("gpio_sw[1].pin = %d\n", gpio_sw[1].pin);
-        ret_chk = ioctl(fd, GET_PIN, &gpio_sw[1]);
-        printf("gpio read: %d\n", ret_chk);
+        /* Test: read GPIO registers */
+        // gpio_sw[0].data = ioctl(fd, GET_PIN, &gpio_sw[0]) ? 0 : 1;
+        // printf("gpio read sw[0]: %d\n", gpio_sw[0].data);
+        // gpio_sw[1].data = ioctl(fd, GET_PIN, &gpio_sw[1]) ? 0 : 1;
+        // printf("gpio read sw[1]: %d\n", gpio_sw[1].data);
 
-        gpio_led.data = TRUE;
+        // if (gpio_sw[0].data == gpio_sw[1].data) {
+        //     gpio_led.data = TRUE;
+        // }
+
+        /* Test: XNOR gate- read AXI_GPIO(xor in pl) and send the complementary val to led */
+        gpio_led.data = ioctl(fd, GET_PIN, &gpio_xor) ? 0 : 1;      // xnor: the led.data val is reversed
+        // printf("gpio_led.data: %d\n", gpio_led.data);
         ret_chk = ioctl(fd, SET_PIN, &gpio_led);
-        printf("func return: %d\n", ret_chk);
-        usleep(500000);
-        gpio_led.data = FALSE;
-        ret_chk = ioctl(fd, SET_PIN, &gpio_led);
-        printf("func return: %d\n", ret_chk);
-        usleep(500000);
+        // printf("func return: %d\n", ret_chk);
+        
+        /* Test: blink led */
+        // gpio_led.data = TRUE;
+        // ret_chk = ioctl(fd, SET_PIN, &gpio_led);
+        // printf("func return: %d\n", ret_chk);
+        // usleep(1000000);
+        // gpio_led.data = FALSE;
+        // ret_chk = ioctl(fd, SET_PIN, &gpio_led);
+        //printf("func return: %d\n", ret_chk);
+        usleep(1000000);
 
         // ret_chk = xgpio_writereg(fd, wr_buffer, led, TRUE);
         // printf("bytes written: %d\n", ret_chk);

@@ -14,7 +14,7 @@
 #include "gpio_ops.h"
 
 
-#define DRV_NAME "gpio-pl"
+#define DRV_NAME "gpiopl"
 
 /* ---------------- File-Operation declarations ----------------- */
 
@@ -39,12 +39,16 @@ static struct class *cls;
 
 static uint32_t getPinVal(unsigned int pin) {
     int bank;
+    
+    /* pin = 255(-1): read gpio_0/S_AXI mem port */
+    if (pin == 255)
+	    return xor_axi_gpio_rd();
 
     /* set pin, bank values for MIO/EMIO */
 	if (pin >= GPIO_PIN_MAX) {
 		printk("ERROR: %s: Undefined pin value: %d\n", DRV_NAME, pin);
 		return -1;
-	} else if (pin > 0 && pin < 54)	{
+	} else if (pin >= 0 && pin < 54)	{
 	    bank = pin / (GPIO_REG_SIZE * 8);
         pin = pin % (GPIO_REG_SIZE * 8);
 	} else if (pin >= 54) {
@@ -62,7 +66,7 @@ static int setPinVal(int pin, int val) {
 	if (pin >= GPIO_PIN_MAX) {
 		printk("ERROR: %s: Undefined pin value: %d\n", DRV_NAME, pin);
 		return -1;
-	} else if (pin > 0 && pin < 54)	{
+	} else if (pin >= 0 && pin < 54)	{
 		bank = pin / (GPIO_REG_SIZE * 8);
 		pin = pin % (GPIO_REG_SIZE * 8);
 	} else if (pin >= 54) {
@@ -158,32 +162,28 @@ static long gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 	        	pr_alert("ERROR: %s: buffer overflow: %d bytes failed\n", DRV_NAME, ret_val);
 	        	return -1;
 	        }
-	        
-	        pr_info("databuf->pin,val: %d,%d\n", databuf.pin, databuf.data);
 
             ret_val = getPinVal(databuf.pin);
             if (ret_val < 0) {
-                pr_alert("ERROR: %s: Undefined pin value\n", DRV_NAME);
+                pr_alert("ERROR: %s: Undefined pin value: %d\n", DRV_NAME, ret_val);
             }
-            
+
             return ret_val;
-        
+
         case SET_PIN:
             ret_val = copy_from_user(&databuf, (struct gpio_ioctl *)arg, databuf_size);
             if (ret_val) {
 	        	pr_alert("ERROR: %s: buffer overflow: %d bytes failed\n", DRV_NAME, ret_val);
 	        	return -1;
 	        }
-	        
-	        pr_info("INFO: %s: databuf->pin,val: %d,%d\n", DRV_NAME, databuf.pin, databuf.data);
-	        
+
 	        ret_val = setPinVal(databuf.pin, databuf.data);
 	        if (ret_val < 0) {
-	            pr_alert("ERROR: %s: Undefined pin value2: %d\n", DRV_NAME, ret_val);
+	            pr_alert("ERROR: %s: Undefined pin value: %d\n", DRV_NAME, ret_val);
 	        }
-	        
+
             return ret_val;
-    
+
         default:
             pr_err("%s: Invalid i/o control signal. Aborting device operation\n", DRV_NAME);
             return -1;
@@ -225,14 +225,17 @@ static int  __init gpio_driver_init(void) {
 	// 	return -ENOMEM;
 	// }
 
-    printk("%s: ", DRV_NAME);
+    // printk("%s: ", DRV_NAME);
+    map_gpio_axi();
     map_gpio_reg();
+    
 
     return 0;
 }
 
 static void __exit gpio_driver_exit(void) {
     unmap_gpio_reg();
+    unmap_gpio_axi();
 
     device_destroy(cls, MKDEV(MAJOR_NUM, 0));  
     class_destroy(cls);

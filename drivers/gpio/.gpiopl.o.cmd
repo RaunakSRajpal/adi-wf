@@ -1,1 +1,0 @@
-savedcmd_/home/raunak/wise-rsr/drivers/gpio/gpiopl.o := arm-linux-gnueabihf-ld  -EL -z noexecstack --no-warn-rwx-segments    -r -o /home/raunak/wise-rsr/drivers/gpio/gpiopl.o @/home/raunak/wise-rsr/drivers/gpio/gpiopl.mod 

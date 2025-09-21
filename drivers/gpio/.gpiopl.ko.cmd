@@ -1,1 +1,0 @@
-savedcmd_/home/raunak/wise-rsr/drivers/gpio/gpiopl.ko := arm-linux-gnueabihf-ld -r  -EL -z noexecstack --no-warn-rwx-segments  --build-id=sha1  -T scripts/module.lds -o /home/raunak/wise-rsr/drivers/gpio/gpiopl.ko /home/raunak/wise-rsr/drivers/gpio/gpiopl.o /home/raunak/wise-rsr/drivers/gpio/gpiopl.mod.o /home/raunak/wise-rsr/drivers/gpio/.module-common.o
