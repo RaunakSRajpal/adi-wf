@@ -46,8 +46,9 @@ extern "C" {
 
 /***************************** Include Files *********************************/
 
+#include <linux/types.h>
 #include "xil_types.h"
-#include <linux/printk.h> // #include "xil_printf.h"
+#include <linux/printk.h>	// #include "xil_printf.h"
 #include "xstatus.h"
 
 #if defined (__MICROBLAZE__)
@@ -98,9 +99,9 @@ extern u32 XStl_RegUpdate(u32 RegAddr, u32 RegVal);
 
 *
 ******************************************************************************/
-static INLINE u8 Xil_In8(UINTPTR Addr)
+static INLINE uint8_t Xil_In8(UINTPTR Addr)
 {
-	return *(volatile u8 *) Addr;
+	return *(volatile uint8_t *) Addr;
 }
 
 /*****************************************************************************/
@@ -115,9 +116,9 @@ static INLINE u8 Xil_In8(UINTPTR Addr)
 * @return	The 16 bit Value read from the specified input address.
 *
 ******************************************************************************/
-static INLINE u16 Xil_In16(UINTPTR Addr)
+static INLINE uint16_t Xil_In16(UINTPTR Addr)
 {
-	return *(volatile u16 *) Addr;
+	return *(volatile uint16_t *) Addr;
 }
 
 /*****************************************************************************/
@@ -132,9 +133,9 @@ static INLINE u16 Xil_In16(UINTPTR Addr)
 * @return	The 32 bit Value read from the specified input address.
 *
 ******************************************************************************/
-static INLINE u32 Xil_In32(UINTPTR Addr)
+static INLINE uint32_t Xil_In32(UINTPTR Addr)
 {
-	return *(volatile u32 *) Addr;
+	return *(volatile uint32_t *) Addr;
 }
 
 /*****************************************************************************/
@@ -149,9 +150,9 @@ static INLINE u32 Xil_In32(UINTPTR Addr)
 * @return	The 64 bit Value read from the specified input address.
 *
 ******************************************************************************/
-static INLINE u64 Xil_In64(UINTPTR Addr)
+static INLINE uint64_t Xil_In64(UINTPTR Addr)
 {
-	return *(volatile u64 *) Addr;
+	return *(volatile uint64_t *) Addr;
 }
 
 /*****************************************************************************/
@@ -164,13 +165,13 @@ static INLINE u64 Xil_In64(UINTPTR Addr)
 * @param	Value contains the 8 bit Value to be written at the specified
 *           address.
 *
-* @return	None.
+* @return	None
 *
 ******************************************************************************/
-static INLINE void Xil_Out8(UINTPTR Addr, u8 Value)
+static INLINE void Xil_Out8(UINTPTR Addr, uint8_t Value)
 {
 	/* write 8 bit value to specified address */
-	volatile u8 *LocalAddr = (volatile u8 *)Addr;
+	volatile uint8_t *LocalAddr = (volatile uint8_t*)Addr;
 	*LocalAddr = Value;
 }
 
@@ -186,10 +187,10 @@ static INLINE void Xil_Out8(UINTPTR Addr, u8 Value)
 * @return	None.
 *
 ******************************************************************************/
-static INLINE void Xil_Out16(UINTPTR Addr, u16 Value)
+static INLINE void Xil_Out16(UINTPTR Addr, uint16_t Value)
 {
 	/* write 16 bit value to specified address */
-	volatile u16 *LocalAddr = (volatile u16 *)Addr;
+	volatile uint16_t *LocalAddr = (volatile uint16_t*)Addr;
 	*LocalAddr = Value;
 }
 
@@ -206,11 +207,11 @@ static INLINE void Xil_Out16(UINTPTR Addr, u16 Value)
 * @return	None.
 *
 ******************************************************************************/
-static INLINE void Xil_Out32(UINTPTR Addr, u32 Value)
+static INLINE void Xil_Out32(UINTPTR Addr, uint32_t Value)
 {
 	/* write 32 bit value to specified address */
 #ifndef ENABLE_SAFETY
-	volatile u32 *LocalAddr = (volatile u32 *)Addr;
+	volatile uint32_t *LocalAddr = (volatile uint32_t*)Addr;
 	*LocalAddr = Value;
 #else
 	XStl_RegUpdate(Addr, Value);
@@ -229,7 +230,7 @@ static INLINE void Xil_Out32(UINTPTR Addr, u32 Value)
 * @return	None.
 *
 ******************************************************************************/
-static INLINE void Xil_Out64(UINTPTR Addr, u64 Value)
+static INLINE void Xil_Out64(UINTPTR Addr, uint64_t Value)
 {
 	/* write 64 bit value to specified address */
 	volatile u64 *LocalAddr = (volatile u64 *)Addr;
@@ -251,11 +252,11 @@ static INLINE void Xil_Out64(UINTPTR Addr, u64 Value)
  *        	- XST_FAILURE on failure
  *
  *****************************************************************************/
-static INLINE int Xil_SecureOut32(UINTPTR Addr, u32 Value)
+static INLINE int Xil_SecureOut32(UINTPTR Addr, uint32_t Value)
 {
 	int Status = XST_FAILURE;
-	u32 ReadReg;
-	u32 ReadRegTemp;
+	uint32_t ReadReg;
+	uint32_t ReadRegTemp;
 
 	/* writing 32 bit value to specified address */
 	Xil_Out32(Addr, Value);
@@ -281,9 +282,9 @@ static INLINE int Xil_SecureOut32(UINTPTR Addr, u32 Value)
 * @return	16 bit Data with converted endianness
 *
 ******************************************************************************/
-static INLINE __attribute__((always_inline)) u16 Xil_EndianSwap16(u16 Data)
+static INLINE __attribute__((always_inline)) uint16_t Xil_EndianSwap16(uint16_t Data)
 {
-	return (u16) (((Data & 0xFF00U) >> 8U) | ((Data & 0x00FFU) << 8U));
+	return (uint16_t) (((Data & 0xFF00U) >> 8U) | ((Data & 0x00FFU) << 8U));
 }
 
 /*****************************************************************************/
@@ -296,24 +297,24 @@ static INLINE __attribute__((always_inline)) u16 Xil_EndianSwap16(u16 Data)
 * @return	32 bit data with converted endianness
 *
 ******************************************************************************/
-static INLINE __attribute__((always_inline)) u32 Xil_EndianSwap32(u32 Data)
+static INLINE __attribute__((always_inline)) uint32_t Xil_EndianSwap32(uint32_t Data)
 {
-	u16 LoWord;
-	u16 HiWord;
+	uint16_t LoWord;
+	uint32_t HiWord;
 
 	/* get each of the half words from the 32 bit word */
 
-	LoWord = (u16) (Data & 0x0000FFFFU);
-	HiWord = (u16) ((Data & 0xFFFF0000U) >> 16U);
+	LoWord = (uint16_t) (Data & 0x0000FFFFU);
+	HiWord = (uint16_t) ((Data & 0xFFFF0000U) >> 16U);
 
 	/* byte swap each of the 16 bit half words */
 
-	LoWord = (u16)(((LoWord & 0xFF00U) >> 8U) | ((LoWord & 0x00FFU) << 8U));
-	HiWord = (u16)(((HiWord & 0xFF00U) >> 8U) | ((HiWord & 0x00FFU) << 8U));
+	LoWord = (uint16_t)(((LoWord & 0xFF00U) >> 8U) | ((LoWord & 0x00FFU) << 8U));
+	HiWord = (uint16_t)(((HiWord & 0xFF00U) >> 8U) | ((HiWord & 0x00FFU) << 8U));
 
 	/* swap the half words before returning the value */
 
-	return ((((u32)LoWord) << (u32)16U) | (u32)HiWord);
+	return ((((uint32_t)LoWord) << (uint32_t)16U) | (int32_t)HiWord);
 }
 
 #if defined (__MICROBLAZE__)
@@ -359,10 +360,10 @@ static INLINE u16 Xil_In16LE(UINTPTR Addr) /**< Static inline function to Read
 /**
 * Static inline function to Read Register of 16 Bits in Big Endian.
 **********************************************************************************/
-static INLINE u16 Xil_In16BE(UINTPTR Addr)
+static INLINE uint16_t Xil_In16BE(UINTPTR Addr)
 #endif
 {
-	u16 value = Xil_In16(Addr);
+	uint16_t = Xil_In16(Addr);
 	return Xil_EndianSwap16(value);
 }
 
@@ -378,10 +379,10 @@ static INLINE u32 Xil_In32LE(UINTPTR Addr) /**< Static inline function to Read
 /**
 * Static inline function to Read Register of 32 Bits in Big Endian.
 **********************************************************************************/
-static INLINE u32 Xil_In32BE(UINTPTR Addr)
+static INLINE uint32_t Xil_In32BE(UINTPTR Addr)
 #endif
 {
-	u32 value = Xil_In32(Addr);
+	uint32_t value = Xil_In32(Addr);
 	return Xil_EndianSwap32(value);
 }
 
@@ -397,7 +398,7 @@ static INLINE void Xil_Out16LE(UINTPTR Addr, u16 Value) /**< Static inline funct
 /**
 * Static inline function to write Register of 16 Bits in Big Endian.
 **********************************************************************************/
-static INLINE void Xil_Out16BE(UINTPTR Addr, u16 Value)
+static INLINE void Xil_Out16BE(UINTPTR Addr, uint16_t Value)
 #endif
 {
 	Value = Xil_EndianSwap16(Value);
@@ -416,7 +417,7 @@ static INLINE void Xil_Out32LE(UINTPTR Addr, u32 Value) /**< Static inline funct
 /**
 * Static inline function to Read Register of 16 Bits in Big Endian.
 **********************************************************************************/
-static INLINE void Xil_Out32BE(UINTPTR Addr, u32 Value)
+static INLINE void Xil_Out32BE(UINTPTR Addr, uint32_t Value)
 #endif
 {
 	Value = Xil_EndianSwap32(Value);
