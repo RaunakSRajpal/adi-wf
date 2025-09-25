@@ -54,11 +54,11 @@
  *
  ******************************************************************************/
 #ifndef SDT
-XAxiDma_Config *XAxiDma_LookupConfig(u32 DeviceId)
+XAxiDma_Config *XAxiDma_LookupConfig(uint32_t DeviceId)
 {
 	extern XAxiDma_Config XAxiDma_ConfigTable[];
 	XAxiDma_Config *CfgPtr;
-	u32 Index;
+	int32_t Index;
 
 	CfgPtr = NULL;
 
@@ -90,7 +90,7 @@ XAxiDma_Config *XAxiDma_LookupConfigBaseAddr(UINTPTR Baseaddr)
 {
 	extern XAxiDma_Config XAxiDma_ConfigTable[];
 	XAxiDma_Config *CfgPtr;
-	u32 Index;
+	uint32_t Index;
 
 	CfgPtr = NULL;
 
@@ -109,11 +109,11 @@ XAxiDma_Config *XAxiDma_LookupConfig(UINTPTR BaseAddress)
 {
 	extern XAxiDma_Config XAxiDma_ConfigTable[];
 	XAxiDma_Config *CfgPtr;
-	u32 Index;
+	uint32_t Index;
 
 	CfgPtr = NULL;
 
-	for (Index = (u32)0x0; XAxiDma_ConfigTable[Index].Name != NULL; Index++) {
+	for (Index = (uint32_t)0x0; XAxiDma_ConfigTable[Index].Name != NULL; Index++) {
 		if ((XAxiDma_ConfigTable[Index].BaseAddr == BaseAddress) ||
 		    !BaseAddress) {
 			CfgPtr = &XAxiDma_ConfigTable[Index];

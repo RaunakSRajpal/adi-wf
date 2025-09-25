@@ -472,7 +472,7 @@ extern "C" {
 #ifdef __MICROBLAZE__
 #include "xenv.h"
 #else
-#include <string.h>
+#include <linux/string.h>
 #include "xil_cache.h"
 #endif
 
@@ -508,7 +508,7 @@ typedef struct XAxiDma {
  */
 typedef struct {
 #ifndef SDT
-	u32 DeviceId;
+	uint32_t DeviceId;
 #else
 	char *Name;
 #endif
@@ -530,7 +530,7 @@ typedef struct {
 	int AddrWidth;		  /**< Address Width */
 	int SgLengthWidth;
 #ifdef SDT
-	u16 IntrId[2]; /** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	uint16_t IntrId[2]; /** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
 	UINTPTR IntrParent; /** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 #endif
 } XAxiDma_Config;
@@ -732,7 +732,7 @@ typedef struct {
  * Initialization and control functions in xaxidma.c
  */
 #ifndef SDT
-XAxiDma_Config *XAxiDma_LookupConfig(u32 DeviceId);
+XAxiDma_Config *XAxiDma_LookupConfig(uint32_t DeviceId);
 XAxiDma_Config *XAxiDma_LookupConfigBaseAddr(UINTPTR Baseaddr);
 #else
 XAxiDma_Config *XAxiDma_LookupConfig(UINTPTR BaseAddress);
@@ -742,8 +742,8 @@ void XAxiDma_Reset(XAxiDma *InstancePtr);
 int XAxiDma_ResetIsDone(XAxiDma *InstancePtr);
 int XAxiDma_Pause(XAxiDma *InstancePtr);
 int XAxiDma_Resume(XAxiDma *InstancePtr);
-u32 XAxiDma_Busy(XAxiDma *InstancePtr, int Direction);
-u32 XAxiDma_SimpleTransfer(XAxiDma *InstancePtr, UINTPTR BuffAddr, u32 Length,
+uint32_t XAxiDma_Busy(XAxiDma *InstancePtr, int Direction);
+uint32_t XAxiDma_SimpleTransfer(XAxiDma *InstancePtr, UINTPTR BuffAddr, uint32_t Length,
 			   int Direction);
 int XAxiDma_SelectKeyHole(XAxiDma *InstancePtr, int Direction, int Select);
 int XAxiDma_SelectCyclicMode(XAxiDma *InstancePtr, int Direction, int Select);

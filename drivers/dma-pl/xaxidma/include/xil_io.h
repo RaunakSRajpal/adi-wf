@@ -54,12 +54,12 @@ extern "C" {
 #if defined (__MICROBLAZE__)
 #include "mb_interface.h"
 #else
-#include "xpseudo_asm.h"
+#include <asm/io.h> 	// #include "xpseudo_asm.h"
 #endif
 
 /************************** Function Prototypes ******************************/
 #ifdef ENABLE_SAFETY
-extern u32 XStl_RegUpdate(u32 RegAddr, u32 RegVal);
+extern uint32_t XStl_RegUpdate(uint32_t RegAddr, uint32_t RegVal);
 #endif
 
 /***************** Macros (Inline Functions) Definitions *********************/
@@ -233,7 +233,7 @@ static INLINE void Xil_Out32(UINTPTR Addr, uint32_t Value)
 static INLINE void Xil_Out64(UINTPTR Addr, uint64_t Value)
 {
 	/* write 64 bit value to specified address */
-	volatile u64 *LocalAddr = (volatile u64 *)Addr;
+	volatile uint64_t *LocalAddr = (volatile uint64_t *)Addr;
 	*LocalAddr = Value;
 }
 
@@ -350,10 +350,10 @@ static INLINE __attribute__((always_inline)) uint32_t Xil_EndianSwap32(uint32_t 
 
 #if defined (__MICROBLAZE__)
 #ifdef __LITTLE_ENDIAN__
-static INLINE u16 Xil_In16BE(UINTPTR Addr) /**< Static inline function to Read
+static INLINE uint16_t Xil_In16BE(UINTPTR Addr) /**< Static inline function to Read
                                                 Register of 16 Bits in Big Endian */
 #else
-static INLINE u16 Xil_In16LE(UINTPTR Addr) /**< Static inline function to Read
+static INLINE uint16_t Xil_In16LE(UINTPTR Addr) /**< Static inline function to Read
                                                 Register of 16 Bits in Little Endian */
 #endif
 #else
@@ -369,10 +369,10 @@ static INLINE uint16_t Xil_In16BE(UINTPTR Addr)
 
 #if defined (__MICROBLAZE__)
 #ifdef __LITTLE_ENDIAN__
-static INLINE u32 Xil_In32BE(UINTPTR Addr) /**< Static inline function to Read
+static INLINE uint32_t Xil_In32BE(UINTPTR Addr) /**< Static inline function to Read
                                                 Register of 32 Bits in Big Endian */
 #else
-static INLINE u32 Xil_In32LE(UINTPTR Addr) /**< Static inline function to Read
+static INLINE uint32_t Xil_In32LE(UINTPTR Addr) /**< Static inline function to Read
                                                 Register of 32 Bits in Little Endian */
 #endif
 #else
@@ -388,10 +388,10 @@ static INLINE uint32_t Xil_In32BE(UINTPTR Addr)
 
 #if defined (__MICROBLAZE__)
 #ifdef __LITTLE_ENDIAN__
-static INLINE void Xil_Out16BE(UINTPTR Addr, u16 Value) /**< Static inline function to write
+static INLINE void Xil_Out16BE(UINTPTR Addr, uint16_t Value) /**< Static inline function to write
                                                 Register of 16 Bits in Big Endian */
 #else
-static INLINE void Xil_Out16LE(UINTPTR Addr, u16 Value) /**< Static inline function to write
+static INLINE void Xil_Out16LE(UINTPTR Addr, uint16_t Value) /**< Static inline function to write
                                                 Register of 16 Bits in Little Endian */
 #endif
 #else
@@ -407,10 +407,10 @@ static INLINE void Xil_Out16BE(UINTPTR Addr, uint16_t Value)
 
 #if defined (__MICROBLAZE__)
 #ifdef __LITTLE_ENDIAN__
-static INLINE void Xil_Out32BE(UINTPTR Addr, u32 Value) /**< Static inline function to write
+static INLINE void Xil_Out32BE(UINTPTR Addr, uint32_t Value) /**< Static inline function to write
                                                 Register of 32 Bits in Big Endian */
 #else
-static INLINE void Xil_Out32LE(UINTPTR Addr, u32 Value) /**< Static inline function to write
+static INLINE void Xil_Out32LE(UINTPTR Addr, uint32_t Value) /**< Static inline function to write
                                                 Register of 32 Bits in Little Endian */
 #endif
 #else

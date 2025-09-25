@@ -46,10 +46,11 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
-#include <stddef.h>
-#include "bspconfig.h"
-#include "xparameters.h"
+#include <linux/types.h>
+//#include <stdint.h>
+//#include <stddef.h>
+//#include "bspconfig.h"
+//#include "xparameters.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -90,8 +91,8 @@ typedef uint32_t u32;
 #define __XUINT64__
 typedef struct
 {
-	u32 Upper;
-	u32 Lower;
+	uint32_t Upper;
+	uint32_t Lower;
 } Xuint64;
 
 
@@ -181,7 +182,7 @@ typedef void (*XExceptionHandler) (void *InstancePtr);
  *          warning when that quantity is 32-bits.
  */
 #if defined (__aarch64__) || defined (__arch64__)
-#define UPPER_32_BITS(n) ((u32)(((n) >> 16) >> 16))
+#define UPPER_32_BITS(n) ((uint32_t)(((n) >> 16) >> 16))
 #else
 #define UPPER_32_BITS(n) 0U
 #endif
@@ -190,7 +191,7 @@ typedef void (*XExceptionHandler) (void *InstancePtr);
  * @param  n : Number being accessed.
  * @return Bits 0-31 of number
  */
-#define LOWER_32_BITS(n) ((u32)(n))
+#define LOWER_32_BITS(n) ((uint32_t)(n))
 
 /**
  * @brief   Returns 0-31 bits of a number .
@@ -198,7 +199,7 @@ typedef void (*XExceptionHandler) (void *InstancePtr);
  * @return  Bits 0-31 of number.
  */
 #if defined (__aarch64__) || defined (__arch64__)
-#define LEFT_SHIFT_BY_32_BITS(n) (u64)(((u64)n) << 32)
+#define LEFT_SHIFT_BY_32_BITS(n) (uint64_t)(((uint64_t)n) << 32)
 #else
 #define LEFT_SHIFT_BY_32_BITS(n) 0U
 #endif

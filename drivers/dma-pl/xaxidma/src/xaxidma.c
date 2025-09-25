@@ -116,7 +116,7 @@ int XAxiDma_CfgInitialize(XAxiDma *InstancePtr, XAxiDma_Config *Config)
 	UINTPTR BaseAddr;
 	int TimeOut;
 	int Index;
-	u32 MaxTransferLen;
+	uint32_t MaxTransferLen;
 
 	InstancePtr->Initialized = 0;
 
@@ -354,7 +354,7 @@ void XAxiDma_Reset(XAxiDma *InstancePtr)
 ******************************************************************************/
 int XAxiDma_ResetIsDone(XAxiDma *InstancePtr)
 {
-	u32 RegisterValue;
+	uint32_t RegisterValue;
 	XAxiDma_BdRing *TxRingPtr;
 	XAxiDma_BdRing *RxRingPtr;
 
@@ -711,7 +711,7 @@ static int XAxiDma_Started(XAxiDma *InstancePtr)
  * @note	None.
  *
  *****************************************************************************/
-u32 XAxiDma_Busy(XAxiDma *InstancePtr, int Direction)
+uint32_t XAxiDma_Busy(XAxiDma *InstancePtr, int Direction)
 {
 
 	return ((XAxiDma_ReadReg(InstancePtr->RegBase +
@@ -739,7 +739,7 @@ u32 XAxiDma_Busy(XAxiDma *InstancePtr, int Direction)
  *****************************************************************************/
 int XAxiDma_SelectKeyHole(XAxiDma *InstancePtr, int Direction, int Select)
 {
-	u32 Value;
+	uint32_t Value;
 
 	Value = XAxiDma_ReadReg(InstancePtr->RegBase +
 				(XAXIDMA_RX_OFFSET * Direction),
@@ -777,7 +777,7 @@ int XAxiDma_SelectKeyHole(XAxiDma *InstancePtr, int Direction, int Select)
  *****************************************************************************/
 int XAxiDma_SelectCyclicMode(XAxiDma *InstancePtr, int Direction, int Select)
 {
-	u32 Value;
+	uint32_t Value;
 
 	Value = XAxiDma_ReadReg(InstancePtr->RegBase +
 				(XAXIDMA_RX_OFFSET * Direction),
@@ -822,10 +822,10 @@ int XAxiDma_SelectCyclicMode(XAxiDma *InstancePtr, int Direction, int Select)
  *		Simple mode.
  *
  *****************************************************************************/
-u32 XAxiDma_SimpleTransfer(XAxiDma *InstancePtr, UINTPTR BuffAddr, u32 Length,
+uint32_t XAxiDma_SimpleTransfer(XAxiDma *InstancePtr, UINTPTR BuffAddr, uint32_t Length,
 			   int Direction)
 {
-	u32 WordBits;
+	uint32_t WordBits;
 	int RingIndex = 0;
 
 	/* If Scatter Gather is included then, cannot submit
@@ -863,7 +863,7 @@ u32 XAxiDma_SimpleTransfer(XAxiDma *InstancePtr, UINTPTR BuffAddr, u32 Length,
 		}
 
 		if (!InstancePtr->MicroDmaMode) {
-			WordBits = (u32)((InstancePtr->TxBdRing.DataWidth) - 1);
+			WordBits = (uint32_t)((InstancePtr->TxBdRing.DataWidth) - 1);
 		} else {
 			WordBits = XAXIDMA_MICROMODE_MIN_BUF_ALIGN;
 		}
@@ -923,7 +923,7 @@ u32 XAxiDma_SimpleTransfer(XAxiDma *InstancePtr, UINTPTR BuffAddr, u32 Length,
 
 		if (!InstancePtr->MicroDmaMode) {
 			WordBits =
-				(u32)((InstancePtr->RxBdRing[RingIndex].DataWidth) - 1);
+				(uint32_t)((InstancePtr->RxBdRing[RingIndex].DataWidth) - 1);
 		} else {
 			WordBits = XAXIDMA_MICROMODE_MIN_BUF_ALIGN;
 		}

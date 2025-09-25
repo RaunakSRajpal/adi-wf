@@ -314,8 +314,8 @@ int XAxiDma_UpdateBdRingCDesc(XAxiDma_BdRing *RingPtr)
  * @note	This function can be used only when DMA is in SG mode
  *
  *****************************************************************************/
-u32 XAxiDma_BdRingCreate(XAxiDma_BdRing *RingPtr, UINTPTR PhysAddr,
-			 UINTPTR VirtAddr, u32 Alignment, int BdCount)
+uint32_t XAxiDma_BdRingCreate(XAxiDma_BdRing *RingPtr, UINTPTR PhysAddr,
+			 UINTPTR VirtAddr, uint32_t Alignment, int BdCount)
 {
 	int i;
 	UINTPTR BdVirtAddr;
@@ -403,10 +403,10 @@ u32 XAxiDma_BdRingCreate(XAxiDma_BdRing *RingPtr, UINTPTR PhysAddr,
 		/* Put hardware information in the BDs
 		 */
 		XAxiDma_BdWrite(BdVirtAddr, XAXIDMA_BD_HAS_STSCNTRL_OFFSET,
-				(u32)RingPtr->HasStsCntrlStrm);
+				(uint32_t)RingPtr->HasStsCntrlStrm);
 
 		XAxiDma_BdWrite(BdVirtAddr, XAXIDMA_BD_HAS_DRE_OFFSET,
-				(((u32)(RingPtr->HasDRE)) << XAXIDMA_BD_HAS_DRE_SHIFT) |
+				(((uint32_t)(RingPtr->HasDRE)) << XAXIDMA_BD_HAS_DRE_SHIFT) |
 				RingPtr->DataWidth);
 
 		XAXIDMA_CACHE_FLUSH(BdVirtAddr);
@@ -423,10 +423,10 @@ u32 XAxiDma_BdRingCreate(XAxiDma_BdRing *RingPtr, UINTPTR PhysAddr,
 
 	/* Setup the last BD's hardware information */
 	XAxiDma_BdWrite(BdVirtAddr, XAXIDMA_BD_HAS_STSCNTRL_OFFSET,
-			(u32)RingPtr->HasStsCntrlStrm);
+			(uint32_t)RingPtr->HasStsCntrlStrm);
 
 	XAxiDma_BdWrite(BdVirtAddr, XAXIDMA_BD_HAS_DRE_OFFSET,
-			(((u32)(RingPtr->HasDRE)) << XAXIDMA_BD_HAS_DRE_SHIFT) |
+			(((uint32_t)(RingPtr->HasDRE)) << XAXIDMA_BD_HAS_DRE_SHIFT) |
 			RingPtr->DataWidth);
 
 	/* Setup and initialize pointers and counters */
@@ -477,7 +477,7 @@ int XAxiDma_BdRingClone(XAxiDma_BdRing *RingPtr, XAxiDma_Bd *SrcBdPtr)
 {
 	int i;
 	UINTPTR CurBd;
-	u32 Save;
+	uint32_t Save;
 	XAxiDma_Bd TmpBd;
 
 	/* Can't do this function if there isn't a ring */
@@ -574,7 +574,7 @@ int XAxiDma_StartBdRingHw(XAxiDma_BdRing *RingPtr)
 			if (RingPtr->Cyclic) {
 				XAxiDma_WriteReg(RingPtr->ChanBase,
 						 XAXIDMA_TDESC_OFFSET,
-						 (u32)XAXIDMA_VIRT_TO_PHYS(RingPtr->CyclicBd));
+						 (uint32_t)XAXIDMA_VIRT_TO_PHYS(RingPtr->CyclicBd));
 				if (RingPtr->Addr_ext)
 					XAxiDma_WriteReg(RingPtr->ChanBase,
 							 XAXIDMA_TDESC_MSB_OFFSET,
@@ -682,9 +682,9 @@ int XAxiDma_BdRingStart(XAxiDma_BdRing *RingPtr)
  * @note	This function can be used only when DMA is in SG mode
  *
  *****************************************************************************/
-int XAxiDma_BdRingSetCoalesce(XAxiDma_BdRing *RingPtr, u32 Counter, u32 Timer)
+int XAxiDma_BdRingSetCoalesce(XAxiDma_BdRing *RingPtr, uint32_t Counter, uint32_t Timer)
 {
-	u32 Cr;
+	uint32_t Cr;
 
 	Cr = XAxiDma_ReadReg(RingPtr->ChanBase, XAXIDMA_CR_OFFSET);
 
@@ -736,9 +736,9 @@ int XAxiDma_BdRingSetCoalesce(XAxiDma_BdRing *RingPtr, u32 Counter, u32 Timer)
  *
  *****************************************************************************/
 void XAxiDma_BdRingGetCoalesce(XAxiDma_BdRing *RingPtr,
-			       u32 *CounterPtr, u32 *TimerPtr)
+			       uint32_t *CounterPtr, uint32_t *TimerPtr)
 {
-	u32 Cr;
+	uint32_t Cr;
 
 	Cr = XAxiDma_ReadReg(RingPtr->ChanBase, XAXIDMA_CR_OFFSET);
 
@@ -994,8 +994,8 @@ int XAxiDma_BdRingToHw(XAxiDma_BdRing *RingPtr, int NumBd,
 {
 	XAxiDma_Bd *CurBdPtr;
 	int i;
-	u32 BdCr;
-	u32 BdSts;
+	uint32_t BdCr;
+	uint32_t BdSts;
 	int RingIndex = RingPtr->RingIndex;
 
 	if (NumBd < 0) {
@@ -1100,7 +1100,7 @@ int XAxiDma_BdRingToHw(XAxiDma_BdRing *RingPtr, int NumBd,
 		if (RingPtr->Cyclic) {
 			XAxiDma_WriteReg(RingPtr->ChanBase,
 					 XAXIDMA_TDESC_OFFSET,
-					 (u32)XAXIDMA_VIRT_TO_PHYS(RingPtr->CyclicBd));
+					 (uint32_t)XAXIDMA_VIRT_TO_PHYS(RingPtr->CyclicBd));
 			if (RingPtr->Addr_ext)
 				XAxiDma_WriteReg(RingPtr->ChanBase,
 						 XAXIDMA_TDESC_MSB_OFFSET,
@@ -1216,8 +1216,8 @@ int XAxiDma_BdRingFromHw(XAxiDma_BdRing *RingPtr, int BdLimit,
 	XAxiDma_Bd *CurBdPtr;
 	int BdCount;
 	int BdPartialCount;
-	u32 BdSts;
-	u32 BdCr;
+	uint32_t BdSts;
+	uint32_t BdCr;
 
 	CurBdPtr = RingPtr->HwHead;
 	BdCount = 0;
@@ -1401,8 +1401,8 @@ int XAxiDma_BdRingFree(XAxiDma_BdRing *RingPtr, int NumBd,
  *****************************************************************************/
 int XAxiDma_BdRingCheck(XAxiDma_BdRing *RingPtr)
 {
-	u32 AddrV;
-	u32 AddrP;
+	uint32_t AddrV;
+	uint32_t AddrP;
 	int i;
 
 	/* Is the list created */

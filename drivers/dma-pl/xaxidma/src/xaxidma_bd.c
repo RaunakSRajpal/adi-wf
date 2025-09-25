@@ -69,7 +69,7 @@
  * @note	This function can be used only when DMA is in SG mode
  *
  *****************************************************************************/
-int XAxiDma_BdSetLength(XAxiDma_Bd *BdPtr, u32 LenBytes, u32 LengthMask)
+int XAxiDma_BdSetLength(XAxiDma_Bd *BdPtr, uint32_t LenBytes, uint32_t LengthMask)
 {
 	if (LenBytes <= 0 || (LenBytes > LengthMask)) {
 
@@ -100,10 +100,10 @@ int XAxiDma_BdSetLength(XAxiDma_Bd *BdPtr, u32 LenBytes, u32 LengthMask)
  * @note	This function can be used only when DMA is in SG mode
  *
  *****************************************************************************/
-u32 XAxiDma_BdSetBufAddr(XAxiDma_Bd *BdPtr, UINTPTR Addr)
+uint32_t XAxiDma_BdSetBufAddr(XAxiDma_Bd *BdPtr, UINTPTR Addr)
 {
-	u32 HasDRE;
-	u8 WordLen;
+	uint32_t HasDRE;
+	uint8_t WordLen;
 
 	HasDRE = XAxiDma_BdRead(BdPtr, XAXIDMA_BD_HAS_DRE_OFFSET);
 	WordLen = HasDRE & XAXIDMA_BD_WORDLEN_MASK;
@@ -143,7 +143,7 @@ u32 XAxiDma_BdSetBufAddr(XAxiDma_Bd *BdPtr, UINTPTR Addr)
  * @note	This function can be used only when DMA is in SG mode
  *
  *****************************************************************************/
-u32 XAxiDma_BdSetBufAddrMicroMode(XAxiDma_Bd *BdPtr, UINTPTR Addr)
+uint32_t XAxiDma_BdSetBufAddrMicroMode(XAxiDma_Bd *BdPtr, UINTPTR Addr)
 {
 	if (Addr & XAXIDMA_MICROMODE_MIN_BUF_ALIGN) {
 		xil_printf("Error set buf addr %x and %x,"
@@ -185,7 +185,7 @@ u32 XAxiDma_BdSetBufAddrMicroMode(XAxiDma_Bd *BdPtr, UINTPTR Addr)
  *		This function can be used only when DMA is in SG mode
  *
  *****************************************************************************/
-int XAxiDma_BdSetAppWord(XAxiDma_Bd *BdPtr, int Offset, u32 Word)
+int XAxiDma_BdSetAppWord(XAxiDma_Bd *BdPtr, int Offset, uint32_t Word)
 {
 	if (XAxiDma_BdRead(BdPtr, XAXIDMA_BD_HAS_STSCNTRL_OFFSET) == 0) {
 
@@ -223,7 +223,7 @@ int XAxiDma_BdSetAppWord(XAxiDma_Bd *BdPtr, int Offset, u32 Word)
  * @note	This function can be used only when DMA is in SG mode
  *
  *****************************************************************************/
-u32 XAxiDma_BdGetAppWord(XAxiDma_Bd *BdPtr, int Offset, int *Valid)
+uint32_t XAxiDma_BdGetAppWord(XAxiDma_Bd *BdPtr, int Offset, int *Valid)
 {
 	*Valid = 0;
 
@@ -232,7 +232,7 @@ u32 XAxiDma_BdGetAppWord(XAxiDma_Bd *BdPtr, int Offset, int *Valid)
 		xdbg_printf(XDBG_DEBUG_ERROR, "BdRingGetAppWord: no sts cntrl "
 			    "stream in hardware build, no app word available\r\n");
 
-		return (u32)0;
+		return (uint32_t)0;
 	}
 
 	if ((Offset < 0) || (Offset > XAXIDMA_LAST_APPWORD)) {
@@ -240,7 +240,7 @@ u32 XAxiDma_BdGetAppWord(XAxiDma_Bd *BdPtr, int Offset, int *Valid)
 		xdbg_printf(XDBG_DEBUG_ERROR, "BdRingGetAppWord: invalid"
 			    " offset %d", Offset);
 
-		return (u32)0;
+		return (uint32_t)0;
 	}
 
 	*Valid = 1;
@@ -260,9 +260,9 @@ u32 XAxiDma_BdGetAppWord(XAxiDma_Bd *BdPtr, int Offset, int *Valid)
  * @note	This function can be used only when DMA is in SG mode
  *
  *****************************************************************************/
-void XAxiDma_BdSetCtrl(XAxiDma_Bd *BdPtr, u32 Data)
+void XAxiDma_BdSetCtrl(XAxiDma_Bd *BdPtr, uint32_t Data)
 {
-	u32 RegValue = XAxiDma_BdRead(BdPtr, XAXIDMA_BD_CTRL_LEN_OFFSET);
+	uint32_t RegValue = XAxiDma_BdRead(BdPtr, XAXIDMA_BD_CTRL_LEN_OFFSET);
 
 	RegValue &= ~XAXIDMA_BD_CTRL_ALL_MASK;
 

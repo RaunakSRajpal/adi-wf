@@ -89,12 +89,12 @@ typedef struct {
 	int HasDRE;
 	int DataWidth;
 	int Addr_ext;
-	u32 MaxTransferLen;
+	uint32_t MaxTransferLen;
 
 	UINTPTR FirstBdPhysAddr;	/**< Physical address of 1st BD in list */
 	UINTPTR FirstBdAddr;	/**< Virtual address of 1st BD in list */
 	UINTPTR LastBdAddr;		/**< Virtual address of last BD in the list */
-	u32 Length;		/**< Total size of ring in bytes */
+	uint32_t Length;		/**< Total size of ring in bytes */
 	UINTPTR Separation;		/**< Number of bytes between the starting
 				     address of adjacent BDs */
 	XAxiDma_Bd *FreeHead;	/**< First BD in the free group */
@@ -325,9 +325,9 @@ typedef struct {
 *
 *****************************************************************************/
 #define XAxiDma_BdRingPrev(RingPtr, BdPtr)				\
-	(((u32)(BdPtr) <= (RingPtr)->FirstBdAddr) ?		\
+	(((uint32_t)(BdPtr) <= (RingPtr)->FirstBdAddr) ?		\
 	 (XAxiDma_Bd*)(RingPtr)->LastBdAddr :		\
-	 (XAxiDma_Bd*)((u32)(BdPtr) - (RingPtr)->Separation))
+	 (XAxiDma_Bd*)((uint32_t)(BdPtr) - (RingPtr)->Separation))
 
 /****************************************************************************/
 /**
@@ -527,8 +527,8 @@ typedef struct {
  */
 int XAxiDma_StartBdRingHw(XAxiDma_BdRing *RingPtr);
 int XAxiDma_UpdateBdRingCDesc(XAxiDma_BdRing *RingPtr);
-u32 XAxiDma_BdRingCreate(XAxiDma_BdRing *RingPtr, UINTPTR PhysAddr,
-			 UINTPTR VirtAddr, u32 Alignment, int BdCount);
+uint32_t XAxiDma_BdRingCreate(XAxiDma_BdRing *RingPtr, UINTPTR PhysAddr,
+			 UINTPTR VirtAddr, uint32_t Alignment, int BdCount);
 int XAxiDma_BdRingClone(XAxiDma_BdRing *RingPtr, XAxiDma_Bd *SrcBdPtr);
 int XAxiDma_BdRingAlloc(XAxiDma_BdRing *RingPtr, int NumBd,
 			XAxiDma_Bd **BdSetPtr);
@@ -541,9 +541,9 @@ int XAxiDma_BdRingFromHw(XAxiDma_BdRing *RingPtr, int BdLimit,
 int XAxiDma_BdRingFree(XAxiDma_BdRing *RingPtr, int NumBd,
 		       XAxiDma_Bd *BdSetPtr);
 int XAxiDma_BdRingStart(XAxiDma_BdRing *RingPtr);
-int XAxiDma_BdRingSetCoalesce(XAxiDma_BdRing *RingPtr, u32 Counter, u32 Timer);
+int XAxiDma_BdRingSetCoalesce(XAxiDma_BdRing *RingPtr, uint32_t Counter, uint32_t Timer);
 void XAxiDma_BdRingGetCoalesce(XAxiDma_BdRing *RingPtr,
-			       u32 *CounterPtr, u32 *TimerPtr);
+			       uint32_t *CounterPtr, uint32_t *TimerPtr);
 
 /* The following functions are for debug only
  */
