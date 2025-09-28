@@ -1,9 +1,9 @@
 /*************************************************
- * @file dma_ioctl.h
- * @author Raunak Rajpal (rsajpal@bu.edu)
- * @brief   ioctl patrameters and definitions for
- *          character dma driver, PL-I/O device 
+ * @file    dma_ioctl.h
+ * @author  Raunak Rajpal (rsajpal@bu.edu)
  * 
+ * @brief   ioctl patrameters and definitions for
+ *          character dma driver, PL-I/O device
 **************************************************/
 
 #ifndef GPIO_IOCTL_H
@@ -11,7 +11,7 @@
 
 #include <linux/ioctl.h>
 
-struct dma
+struct dma_ioctl
 {
     uint8_t pin;
     uint8_t data;
@@ -28,6 +28,7 @@ struct dma
 /* The name of the device file */ 
 #define DEVICE_FILE_NAME "axidma_dev"
 #define DEVICE_PATH "/dev/axidma_dev"
+#define DMA_DEV_ID XPAR_AXIDMA_0_DEVICE_ID      // check the correct use of this macro 
 #define DEVFS_BUFMAX_SIZE 1024
 
 #endif
