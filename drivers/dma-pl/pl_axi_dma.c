@@ -1,3 +1,12 @@
+/*******************************************
+ * @file    pl_axi_dma.c
+ * @author  Raunak Rajpal (rsajpal@bu.edu)
+ * 
+ * @brief   Entry point to the device driver
+ *          for PL - DMA control and read/write
+ *          transactons and user i/o commands
+********************************************/
+
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -5,17 +14,19 @@
 #include <linux/ioctl.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
-#include <linux/types.h> /* size_t */
+#include <linux/types.h>    /* size_t */
 #include <linux/fs.h>
 #include <linux/fcntl.h>
 
 #include "dma_ioctl.h"
-#include "gpio_ops.h"
+#include "dma_ops.h"
+
+#include "xaxidma.h"
 
 
 #define DRV_NAME "axidmapl"
 
-/* ---------------- File-Operation declarations ----------------- */
+/* ---------------- File-Operation Prototypes ----------------- */
 
 /* device file-ops functions */
 static int gpio_open(struct inode *inode, struct file *file);
@@ -23,7 +34,7 @@ static int gpio_release(struct inode *inode, struct file *file);
 static ssize_t gpio_read(struct file *file, char __user *devbuf, size_t buf_size, loff_t *offset);
 static long gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
 
-static const struct file_operations gpio_ops = {
+static const struct file_operations dma_fops = {
     .open    =   gpio_open,
     .release =   gpio_release,
     .read    =   gpio_read,
@@ -31,6 +42,9 @@ static const struct file_operations gpio_ops = {
 };
 
 static struct class *cls;
+XAxiDma AxiDma;
+
+uint32_t *Packet = (uint32_t *) TX_BUFFER_BASE;
 /**************************************************************** */
 
 
@@ -71,11 +85,11 @@ static long gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
     {
         int ret_val;
         case RD_DEV:
-            // gpio_read(file, );
+            // gpio_read(file,... );
             break;
 
         case WR_DEV:
-            // gpio_write(file, );
+            // gpio_write(file,... );
             break;
 
         case GET_PIN:
@@ -115,31 +129,79 @@ static long gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 }
 
 
+
 static int  __init gpio_driver_init(void) {
+    int chkStatus;
+    XAxiDma_Config *Config;
+
     printk("%s: initialising driver...\n", DRV_NAME);
 
-    // dev_t gp_dev;
-
     /* Register the character device */
-    int ret_val = register_chrdev(MAJOR_NUM, DRV_NAME, &gpio_ops);
-    if (ret_val < 0) {
+    chkStatus = register_chrdev(MAJOR_NUM, DRV_NAME, &dma_fops);
+    if (chkStatus < 0) {
 		pr_err("ERROR: %s: Failed to initialize char device\n", DRV_NAME);
-	    return ret_val;
+	    return chkStatus;
 	}
 
     pr_info("%s: device %s registered succesfully at %s\n", DRV_NAME, DEVICE_FILE_NAME, DEVICE_PATH);
 
+    /* create /dev entry point fot the device file */
     cls = class_create(DRV_NAME);
     device_create(cls, NULL, MKDEV(MAJOR_NUM, 0), NULL, DEVICE_FILE_NAME);                                                           
 
+    /* create a mapping for the DMA read/write transactions into DDR block memory*/
     map_axi_dma();
 
-    return 0;
+    /* Configure Axi-DMA instance */
+    Config = XAxiDma_LookupConfig(DMA_DEV_ID);
+	if (!Config) {
+		xil_printf("No config found for %d\r\n", DMA_DEV_ID);
+		return XST_FAILURE;
+	}
+
+    /* Initialize DMA engine */
+	chkStatus = XAxiDma_CfgInitialize(&AxiDma, Config);
+	if (chkStatus != XST_SUCCESS) {
+		pr_err("Initialization failed %d\r\n", chkStatus);
+		return XST_FAILURE;
+	}
+
+	if (!XAxiDma_HasSg(&AxiDma)) {
+		pr_info("Device configured as Simple mode \r\n");
+		return XST_FAILURE;
+	}
+
+	chkStatus = TxSetup(&AxiDma);
+	if (chkStatus != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+
+	chkStatus = RxSetup(&AxiDma);
+	if (chkStatus != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+
+	/* Send a packet */
+	chkStatus = SendPacket(&AxiDma);
+	if (chkStatus != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+
+	/* Check DMA transfer result */
+	chkStatus = CheckDmaResult(&AxiDma);
+    if (chkStatus != XST_SUCCESS) {
+		xil_printf("AXI DMA SG Polling Example Failed\r\n");
+		return XST_FAILURE;
+	}
+
+    return XST_SUCCESS;
 }
 
 static void __exit gpio_driver_exit(void) {
+    /* release DDR memory block mapped to the process*/
     unmmap_axi_dma();
 
+    /* release device file; delete device module */
     device_destroy(cls, MKDEV(MAJOR_NUM, 0));  
     class_destroy(cls);
     unregister_chrdev(MAJOR_NUM, DRV_NAME);
@@ -148,7 +210,7 @@ static void __exit gpio_driver_exit(void) {
 	// cdev_del(&ioctl_gpio_dev);
 	// unregister_chrdev_region(gp_dev,dev_count);
 
-	pr_info("%s: process removed\n", DRV_NAME);
+	printk("%s: exiting\n", DRV_NAME);
 
     return;
 }

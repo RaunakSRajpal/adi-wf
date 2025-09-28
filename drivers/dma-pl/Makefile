@@ -1,13 +1,13 @@
 BINARY		:= axidmapl
 KERNEL		:= /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
-usr_src		:= pl_dma_test.c
-usr_obj		:= $(patsubst %.c,%.o, $(usr_src))
+#usr_src		:= usrtest_dmapl.c
+#usr_obj		:= $(patsubst %.c,%.o, $(usr_src))
 
 obj-m += $(BINARY).o
 $(BINARY)-objs := pl_gp_dma.o dma.o
 
-ccflags-y := -I$(src)/include
+ccflags-y := -I$(src)/xaxidma/include
 
 CC		= $(CROSS_COMPILE)gcc
 LD		= $(CROSS_COMPILE)ld
@@ -22,9 +22,11 @@ export CROSS_COMPILE ARCH CC LD AR NM
 export STRIP READELF OBJCOP OBJDUMP
 
 all:
+		make -C $(KERNEL) M=$(KMOD_DIR)/xaxidma/src modules
 		make -C $(KERNEL) M=$(KMOD_DIR) modules
-		$(CC) $(usr_src) -o $(usr_obj)
+#		$(CC) $(usr_src) -o $(usr_obj)
 
 clean: 
+		make -C $(KERNEL) M=$(KMOD_DIR)/xaxidma/src clean
 		make -C $(KERNEL) M=$(KMOD_DIR) clean
-		rm -rf $(usr_obj)
+#		rm -rf $(usr_obj)
