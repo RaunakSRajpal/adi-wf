@@ -42,7 +42,7 @@ static const struct file_operations dma_fops = {
 };
 
 static struct class *cls;
-XAxiDma AxiDma;
+static XAxiDma AxiDma;
 
 uint32_t *Packet = (uint32_t *) TX_BUFFER_BASE;
 /**************************************************************** */
@@ -152,6 +152,7 @@ static int  __init gpio_driver_init(void) {
     /* create a mapping for the DMA read/write transactions into DDR block memory*/
     map_axi_dma();
 
+
     /* Configure Axi-DMA instance */
     Config = XAxiDma_LookupConfig(DMA_DEV_ID);
 	if (!Config) {
@@ -162,7 +163,7 @@ static int  __init gpio_driver_init(void) {
     /* Initialize DMA engine */
 	chkStatus = XAxiDma_CfgInitialize(&AxiDma, Config);
 	if (chkStatus != XST_SUCCESS) {
-		pr_err("Initialization failed %d\r\n", chkStatus);
+        pr_err("Initialization failed: returned %d\n", chkStatus);
 		return XST_FAILURE;
 	}
 
@@ -171,15 +172,15 @@ static int  __init gpio_driver_init(void) {
 		return XST_FAILURE;
 	}
 
-	chkStatus = TxSetup(&AxiDma);
+	chkStatus = extern TxSetup(&AxiDma);
 	if (chkStatus != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
 
-	chkStatus = RxSetup(&AxiDma);
-	if (chkStatus != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
+    chkStatus = RxSetup(&AxiDma);
+    if (chkStatus != XST_SUCCESS) {
+        return XST_FAILURE;
+    }
 
 	/* Send a packet */
 	chkStatus = SendPacket(&AxiDma);
