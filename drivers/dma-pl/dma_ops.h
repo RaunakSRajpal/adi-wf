@@ -40,13 +40,32 @@
 #define TEST_START_VALUE	0xC
 #define POLL_TIMEOUT_COUNTER	1000000U
 
+#define AXIDMA_MEM_SIZE   (64 * PAGE_SIZE)
+
+static volatile void __iomem *axi_dma_baseptr = NULL;
 
 // static inline uint32_t gpio_pin_rd(uint8_t bank, uint8_t pin);
 
 // static inline void gpio_pin_wr(uint8_t bank, uint8_t pin, uint8_t val);
 
-int map_axi_dma(void);
-void unmap_axi_dma(void);
+static inline int map_axi_dma(void) {
+    /* define a base pointer to map PL-AxiDMA to a 64kB of DDR menory block */
+	axi_dma_baseptr = (uint32_t*)ioremap(MEM_BASE_ADDR, AXIDMA_MEM_SIZE);
+	if (axi_dma_baseptr == NULL) {
+		pr_alert("ERROR: failed to map DMA_S_AXI memory: 0x%x\n",  axi_dma_baseptr);
+		return XST_FAILURE;
+	}
+	
+	printk("%s: Successfully mapped in DMA_S_AXI memory at: 0x%x\n", "gpiopl", axi_dma_baseptr);
+
+    return XST_SUCCESS;
+}
+
+static inline void unmap_axi_dma(void) {
+    iounmap(axi_dma_baseptr);
+    return;
+}
+
 
 static int RxSetup(XAxiDma *AxiDmaInstPtr);
 static int TxSetup(XAxiDma *AxiDmaInstPtr);

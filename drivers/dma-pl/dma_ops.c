@@ -6,31 +6,8 @@
  *          required for DMA I/O
 ********************************************/
 
-#include "dma_ops.h"
-
-
-#define AXIDMA_MEM_SIZE   (64 * PAGE_SIZE)
-
-static volatile void __iomem *axi_dma_baseptr = NULL;
-
-
-int map_axi_dma(void) {
-    /* define a base pointer to map PL-AxiDMA to a 64kB of DDR menory block */
-	axi_dma_baseptr = (uint32_t*)ioremap(MEM_BASE_ADDR, AXIDMA_MEM_SIZE);
-	if (axi_dma_baseptr == NULL) {
-		pr_alert("ERROR: failed to map DMA_S_AXI memory: 0x%x\n",  axi_dma_baseptr);
-		return XST_FAILURE;
-	}
-	
-	printk("%s: Successfully mapped in DMA_S_AXI memory at: 0x%x\n", "gpiopl", axi_dma_baseptr);
-
-    return XST_SUCCESS;
-}
-
-void unmap_axi_dma(void) {
-    iounmap(axi_dma_baseptr);
-    return;
-}
+//#include "dma_ops.h"
+#include "xaxidma.h"
 
 
 static int RxSetup(XAxiDma *AxiDmaInstPtr)
@@ -57,13 +34,9 @@ static int RxSetup(XAxiDma *AxiDmaInstPtr)
 	XAxiDma_BdRingSetCoalesce(RxRingPtr, Coalesce, Delay);
 
 	/* Setup Rx BD space */
-	BdCount = XAxiDma_BdRingCntCalc(XAXIDMA_BD_MINIMUM_ALIGNMENT,
-					RX_BD_SPACE_HIGH - RX_BD_SPACE_BASE + 1);
+	BdCount = XAxiDma_BdRingCntCalc(XAXIDMA_BD_MINIMUM_ALIGNMENT, RX_BD_SPACE_HIGH - RX_BD_SPACE_BASE + 1);
 
-	Status = XAxiDma_BdRingCreate(RxRingPtr, RX_BD_SPACE_BASE,
-				      RX_BD_SPACE_BASE,
-				      XAXIDMA_BD_MINIMUM_ALIGNMENT, BdCount);
-
+	Status = XAxiDma_BdRingCreate(RxRingPtr, RX_BD_SPACE_BASE, RX_BD_SPACE_BASE, XAXIDMA_BD_MINIMUM_ALIGNMENT, BdCount);
 	if (Status != XST_SUCCESS) {
 		xil_printf("RX create BD ring failed %d\r\n", Status);
 
@@ -167,12 +140,9 @@ static int TxSetup(XAxiDma *AxiDmaInstPtr)
 	XAxiDma_BdRingSetCoalesce(TxRingPtr, Coalesce, Delay);
 
 	/* Setup TxBD space  */
-	BdCount = XAxiDma_BdRingCntCalc(XAXIDMA_BD_MINIMUM_ALIGNMENT,
-					TX_BD_SPACE_HIGH - TX_BD_SPACE_BASE + 1);
+	BdCount = XAxiDma_BdRingCntCalc(XAXIDMA_BD_MINIMUM_ALIGNMENT, TX_BD_SPACE_HIGH - TX_BD_SPACE_BASE + 1);
 
-	Status = XAxiDma_BdRingCreate(TxRingPtr, TX_BD_SPACE_BASE,
-				      TX_BD_SPACE_BASE,
-				      XAXIDMA_BD_MINIMUM_ALIGNMENT, BdCount);
+	Status = XAxiDma_BdRingCreate(TxRingPtr, TX_BD_SPACE_BASE, TX_BD_SPACE_BASE, XAXIDMA_BD_MINIMUM_ALIGNMENT, BdCount);
 	if (Status != XST_SUCCESS) {
 		xil_printf("failed create BD ring in txsetup\r\n");
 
