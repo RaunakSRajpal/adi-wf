@@ -1,13 +1,18 @@
 BINARY		:= gpiopl
 KERNEL		:= /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
+INCLUDEDIR	:= opt/Xilinx/Vitis/2024.2/data/embeddedsw/XilinxProcessorIPLib/drivers
 usr_src		:= pl_gp_test.c
 usr_obj		:= $(patsubst %.c,%.o, $(usr_src))
+#EXTRA_CFLAGS	:= -I$(INCLUDEDIR)/gpiops_v3_13/src
 
 obj-m := $(BINARY).o
 $(BINARY)-objs := pl_gpio.o gpio_ops.o
 
-ccflags-y := -I$(src)
+ccflags-y := -I$(src)/include
+# ccflags-y += -I$(INCLUDEDIR)/gpiops_v3_13/src
+# ccflags-y += -I$(INCLUDEDIR)/common_v1_3/src
+# ccflags-y += -I$(INCLUDEDIR)/axidma_v9_19
 
 CC		= $(CROSS_COMPILE)gcc
 LD		= $(CROSS_COMPILE)ld

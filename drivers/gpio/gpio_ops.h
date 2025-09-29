@@ -30,6 +30,7 @@
 #define XGPIOPS_OEN__(X)        (uint32_t)0x00000208 + (X*4 << 4)
 
 #define XGPIOPS_AXI_BASE_ADDR   (uint32_t)0x41210000
+// #define XGPIOPS_AXI_BASE_ADDR   (uint32_t)0xE000A100
 
 
 uint32_t gpio_pin_rd(uint8_t bank, uint8_t pin);

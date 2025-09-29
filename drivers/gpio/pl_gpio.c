@@ -34,6 +34,7 @@ static const struct file_operations gpio_ops = {
 };
 
 static struct class *cls;
+struct gpio_ioctl databuf;
 
 
 
@@ -142,7 +143,7 @@ static ssize_t gpio_write(struct file *file, const char __user *devbuf, size_t b
 }
 
 static long gpio_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
-    struct gpio_ioctl databuf;
+    
     unsigned int databuf_size = sizeof(databuf);
 
     switch (cmd)
@@ -226,14 +227,18 @@ static int  __init gpio_driver_init(void) {
 	// }
 
     // printk("%s: ", DRV_NAME);
-    map_gpio_axi();
-    map_gpio_reg();
     
+    map_gpio_reg();
+    map_gpio_axi();
 
     return 0;
 }
 
 static void __exit gpio_driver_exit(void) {
+    /* clear all the gpio bits */
+    databuf.data = 0;
+    setPinVal(databuf.pin,databuf.data);
+    
     unmap_gpio_reg();
     unmap_gpio_axi();
 

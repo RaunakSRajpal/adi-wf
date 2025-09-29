@@ -6,6 +6,7 @@
 static volatile void __iomem *gpio_registers = NULL;
 static volatile void __iomem *gpio_axi_reg = NULL;
 
+
 uint32_t gpio_pin_rd(uint8_t bank, uint8_t pin) {
     uint32_t* dirm_x 	= (uint32_t*)(gpio_registers + XGPIOPS_DIRM__(bank));
     uint32_t* oen_x  	= (uint32_t*)(gpio_registers + XGPIOPS_OEN__(bank));
@@ -84,4 +85,5 @@ void unmap_gpio_axi(void) {
 uint32_t xor_axi_gpio_rd(void) {
     return *(uint32_t*)gpio_axi_reg;
 }
+
 

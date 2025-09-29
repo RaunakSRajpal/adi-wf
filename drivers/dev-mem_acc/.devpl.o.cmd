@@ -1,0 +1,1 @@
+savedcmd_/home/raunak/wise-rsr/drivers/dev-mem_acc/devpl.o := arm-linux-gnueabihf-ld  -EL -z noexecstack --no-warn-rwx-segments    -r -o /home/raunak/wise-rsr/drivers/dev-mem_acc/devpl.o @/home/raunak/wise-rsr/drivers/dev-mem_acc/devpl.mod 
