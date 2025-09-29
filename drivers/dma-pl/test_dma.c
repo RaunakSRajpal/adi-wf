@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <sys/mman.h>
+#include <string.h>
 
 #define MM2S_CONTROL_REGISTER 0x00
 #define MM2S_STATUS_REGISTER 0x04
@@ -17,6 +18,15 @@
 #define AXI_LITE_REG        0x40400000
 #define AXI_HP_BASE_ADDR    0x20000000
 #define AXI_HP_HIGH_ADDR    0x2fffffff
+
+
+unsigned int dma_set(unsigned int* dma_virtual_address, int offset, unsigned int value);
+unsigned int dma_get(unsigned int* dma_virtual_address, int offset);
+int dma_mm2s_sync(unsigned int* dma_virtual_address);
+int dma_s2mm_sync(unsigned int* dma_virtual_address);
+void dma_s2mm_status(unsigned int* dma_virtual_address);
+void dma_mm2s_status(unsigned int* dma_virtual_address);
+void memdump(void* virtual_address, int byte_count);
 
 
 
