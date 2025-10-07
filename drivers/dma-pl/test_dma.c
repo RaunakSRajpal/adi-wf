@@ -15,7 +15,7 @@
 #define S2MM_DESTINATION_ADDRESS 0x48
 #define S2MM_LENGTH 0x58
 
-#define PACKET_SIZE 32
+#define PACKET_SIZE 8
 
 #define AXI_LITE_REG        0x40400000
 #define AXI_HP_BASE_ADDR    0x0e000000 //0x30000000
@@ -130,45 +130,45 @@ int main() {
     printf("init src addr pointers\n");
     memset(virtual_destination_address, 0, 32); // Clear destination block
 
-    int num = 8;
-    //for (int i=0; i < num; i++) {
+    int num = 4;
+    for (int i=0; i < num; i++) {
     
     printf("Source memory block:      "); memdump(virtual_source_address, 32);
     printf("Destination memory block: "); memdump(virtual_destination_address, 32);
 
-    //printf("Resetting DMA\n");
+    // printf("Resetting DMA\n");
     dma_set(virtual_address, S2MM_CONTROL_REGISTER, 4);
     dma_set(virtual_address, MM2S_CONTROL_REGISTER, 4);
-    //dma_s2mm_status(virtual_address);
-    //dma_mm2s_status(virtual_address);
+    // dma_s2mm_status(virtual_address);
+    // dma_mm2s_status(virtual_address);
 
-    //printf("Halting DMA\n");
+    // printf("Halting DMA\n");
     dma_set(virtual_address, S2MM_CONTROL_REGISTER, 0);
     dma_set(virtual_address, MM2S_CONTROL_REGISTER, 0);
-    //dma_s2mm_status(virtual_address);
-    //dma_mm2s_status(virtual_address);
+    // dma_s2mm_status(virtual_address);
+    // dma_mm2s_status(virtual_address);
 
-    //printf("Writing destination address\n");
-    dma_set(virtual_address, S2MM_DESTINATION_ADDRESS, (unsigned int)AXI_HP_HIGH_ADDR); // Write destination address
-    //dma_s2mm_status(virtual_address);
+    // printf("Writing destination address\n");
+    dma_set(virtual_address, S2MM_DESTINATION_ADDRESS, (unsigned int)AXI_HP_HIGH_ADDR + 8*i); // Write destination address
+    // dma_s2mm_status(virtual_address);
 
-    //printf("Writing source address...\n");
-    dma_set(virtual_address, MM2S_START_ADDRESS, (unsigned int)AXI_HP_BASE_ADDR); // Write source address
-    //dma_mm2s_status(virtual_address);
+    // printf("Writing source address...\n");
+    dma_set(virtual_address, MM2S_START_ADDRESS, (unsigned int)AXI_HP_BASE_ADDR + 8*i); // Write source address
+    // dma_mm2s_status(virtual_address);
 
-    //printf("Starting S2MM channel with all interrupts masked...\n");
+    // printf("Starting S2MM channel with all interrupts masked...\n");
     dma_set(virtual_address, S2MM_CONTROL_REGISTER, 0xf001);
-    //dma_s2mm_status(virtual_address);
+    // dma_s2mm_status(virtual_address);
 
-    //printf("Starting MM2S channel with all interrupts masked...\n");
+    // printf("Starting MM2S channel with all interrupts masked...\n");
     dma_set(virtual_address, MM2S_CONTROL_REGISTER, 0xf001);
-    //dma_mm2s_status(virtual_address);
+    // dma_mm2s_status(virtual_address);
 
-    //printf("Writing S2MM transfer length...\n");
+    // printf("Writing S2MM transfer length...\n");
     dma_set(virtual_address, S2MM_LENGTH, PACKET_SIZE);
     dma_s2mm_status(virtual_address);
 
-    //printf("Writing MM2S transfer length...\n");
+    // printf("Writing MM2S transfer length...\n");
     dma_set(virtual_address, MM2S_LENGTH, PACKET_SIZE);
     dma_mm2s_status(virtual_address);
 
@@ -183,5 +183,5 @@ int main() {
 
     printf("Destination memory block: "); memdump(virtual_destination_address, 32);
     printf("\n");
-    //}
+    }
 }
