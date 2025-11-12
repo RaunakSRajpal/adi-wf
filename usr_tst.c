@@ -11,12 +11,8 @@
 // #include "gpio_ioctl.h"
 #include "lib/pl_gpio.h"
 
-#define TRUE 1
-#define FALSE 0
-
-#define EMIO_BASE 54
-
 struct gpio_dev dev;
+
 
 
 int main() {
