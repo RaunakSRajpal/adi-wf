@@ -7,16 +7,7 @@
 #include <linux/ioctl.h>
 
 #include "../drivers/gpio/gpio_ioctl.h"
-
-#define TRUE 1
-#define FALSE 0
-#define EMIO_BASE 54
-
-struct gpio_dev {
-    int fd = -1;
-    struct gpio_ioctl_pin gpb;
-    struct gpio_ioctl_reg gpr;
-}
+#include "pl_gpio.h"
 
 int gpio_init(struct gpio_dev *dev) {
     dev->fd = open("/dev/gpiopl_dev", O_RDWR);
@@ -31,6 +22,7 @@ int gpio_init(struct gpio_dev *dev) {
 
 int gpio_release(struct gpio_dev *dev) {
     close(dev->fd);
+    return 0;
 }
 
 int gpio_write(struct gpio_dev *dev, uint8_t bank, uint32_t reg_data) {
