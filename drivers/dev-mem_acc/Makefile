@@ -1,5 +1,12 @@
+WS_CURRENT	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../..)
+WS		:= $(or $(WS), $(WS_CURRENT))
+include $(WS)/project_setup.env
+include $(WS)/scripts/setup.env
+export
+
+
 BINARY		:= devpl
-KERNEL		:= /home/raunak/wise-rsr/linux-adi
+KERNEL		:= $(LINUX_DIR)		# /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
 #usr_src		:= pl_dma_test.c
 #usr_obj		:= $(patsubst %.c,%.o, $(usr_src))
@@ -23,9 +30,13 @@ export STRIP READELF OBJCOP OBJDUMP
 
 all:
 		make -C $(KERNEL) M=$(KMOD_DIR) modules
-		#$(CC) $(usr_src) -o $(usr_obj)
+# 		$(CC) $(usr_src) -o $(usr_obj)
 
 clean: 
 		make -C $(KERNEL) M=$(KMOD_DIR) clean
-		#rm -rf $(usr_obj)
+# 		rm -rf $(usr_obj)
 
+test:
+		@echo "Makefile lives in: $(WS)"
+		@echo "Makefile List: $(MAKEFILE_LIST)"
+		@echo "linux dir: $(LINUX_DIR)"

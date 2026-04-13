@@ -1,7 +1,14 @@
+WS_CURRENT	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../..)
+WS		:= $(or $(WS), $(WS_CURRENT))
+include $(WS)/project_setup.env
+include $(WS)/scripts/setup.env
+export
+
+
 BINARY		:= gpiopl
-KERNEL		:= /home/raunak/wise-rsr/linux-adi
+KERNEL		:= $(LINUX_DIR)		# /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
-INCLUDEDIR	:= opt/Xilinx/Vitis/2024.2/data/embeddedsw/XilinxProcessorIPLib/drivers
+INCLUDEDIR	:= $(XVITIS)/data/embeddedsw/XilinxProcessorIPLib/drivers	# opt/Xilinx/Vitis/2024.2/data/embeddedsw/XilinxProcessorIPLib/drivers
 usr_src		:= pl_gp_test.c
 usr_obj		:= $(patsubst %.c,%.o, $(usr_src))
 #EXTRA_CFLAGS	:= -I$(INCLUDEDIR)/gpiops_v3_13/src

@@ -1,5 +1,12 @@
+WS_CURRENT	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../..)
+WS		:= $(or $(WS), $(WS_CURRENT))
+include $(WS)/project_setup.env
+include $(WS)/scripts/setup.env
+export
+
+
 BINARY		:= axidmapl
-KERNEL		:= /home/raunak/wise-rsr/linux-adi
+KERNEL		:= $(LINUX_DIR)		# /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
 #usr_src		:= usrtest_dmapl.c
 #usr_obj		:= $(patsubst %.c,%.o, $(usr_src))
