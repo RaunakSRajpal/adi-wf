@@ -1,0 +1,111 @@
+## Prerequisites
+*.d
+*.xpr
+*.sif
+
+## directory
+build/**/
+*/**/linux-adi
+*/**/hdl
+pl-proj
+BIN_pkg
+sysmod_rootfs
+*.cache
+*.hw
+.metadata
+*.data
+*.ipdefs
+.Xil
+*.sdk
+*.srcs
+*.ip_user_files
+ipcache
+
+## Export files
+*.xsa
+*dtb
+uImage
+
+## simulation results
+*/**/*.sim/**/xsim/
+# *.sim\**\xsim\
+!*.wcfg
+!*.coe
+
+## Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+## Linker output
+*.ilk
+*.map
+*.exp
+
+## Precompiled Headers
+*.gch
+*.pch
+
+## Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+## Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+## Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+## Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+*.dwo
+
+## Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+## reports/logs/dump files
+*.jou
+*.log
+*.debug
+*.str
+*.zip
+*.tmp
+*.rst
+*.os
+*.js
+*.pb
+*.dcp
+*.hwdef
+*.vds
+*.veo
+*.wdf
+*.vdi
+*.dmp
+*.rpx
+*.rpt
+*.rlx
+*.prj
+
+## ip
+ipshared
+ipcfg
