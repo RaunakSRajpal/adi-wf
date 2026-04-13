@@ -1,5 +1,12 @@
 #!/bin/bash
 
+###################################################
+###                                             ###
+### DEPRECATED: DO NOT USE THIS SCRIPT ANYMORE  ###
+###                                             ###
+###################################################
+
+
 # REMEMBER TO UNCOMMENT THE CONFIGURE LINE FOR YOUR TARGET PLATFORM.
 # ... and comment out the default of course.
 
