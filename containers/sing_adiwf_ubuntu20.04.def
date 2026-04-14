@@ -1,0 +1,107 @@
+Bootstrap: docker
+From: ubuntu:20.04
+Stage: build
+
+
+%labels
+    Author rsrajpal@bu.edu
+    # Dockerfile References: https://docs.docker.com/engine/reference/builder/
+
+
+%setup
+    mkdir ${SINGULARITY_ROOTFS}/opt/uboot/
+    # mkdir ${SINGULARITY_ROOTFS}/lib/
+
+
+%files
+#     /file1
+
+
+%environment
+    export TZ=UTC
+    export DEBIAN_FRONTEND=noninteractive
+    export TERM=xterm
+    export LC_ALL=en_US.UTF-8
+    export LANG=en_US.UTF-8
+    export LANGUAGE=en_US.UTF-8
+    # export LISTEN_PORT=54321
+
+%post -c /bin/bash
+    ## prep environment
+    export TZ=UTC
+    export DEBIAN_FRONTEND=noninteractive
+    export TERM=vt100
+    export LC_ALL=C
+    set -xe
+    
+
+    ## install libraries and packages                                           # specify --version for reproducibility
+    apt-get update && apt-get install -y apt-utils gcc tzdata locales git vim wget gettext-base uuid-dev default-jre \
+    bash bash-completion autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev libtool gawk \
+    bc bison build-essential device-tree-compiler dfu-util efitools flex gdisk graphviz imagemagick \
+    libgnutls28-dev libguestfs-tools libncurses-dev \
+    libpython3-dev libsdl2-dev libssl-dev lz4 lzma lzma-alone openssl \
+    pkg-config python3 python3-asteval python3-coverage python3-filelock \
+    python3-pkg-resources python3-pycryptodome python3-pyelftools \
+    python3-pytest python3-pytest-xdist python3-sphinxcontrib.apidoc \
+    python3-sphinx-rtd-theme python3-subunit python3-testtools \
+    python3-venv rsync swig software-properties-common patchutils xterm zlib1g-dev
+
+    apt-get update && apt-get install -y cmake                                  # install cmake tools
+    apt-get install -y u-boot-tools                                             # u-boot-tools includes the mkimage pkg (required)
+    apt-get install -y gcc gcc-aarch64-linux-gnu                                # install gcc cross compiler for ARMv8 architecture
+    echo "uboot tools installedL: " && mkimage -V
+
+    ## Install Linaro toolchains at /lib/
+    cd /lib/ && wget https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabi/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz
+    tar -xvf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz && rm -rf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz
+    export CROSS_COMPILE=/lib/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-
+    echo && echo "Linaro toolchain installed" 
+    echo "VERSION: " && ${CROSS_COMPILE}gcc --version
+
+    ## Install ADI Linux repository into /opt/uboot/
+    # cd /opt/uboot/
+    # --------- Install Das U-Boot -------------- #
+    
+    # uncomment below line for a specific release; xx=release year v=1/2
+    # git checkout origin/<20xx>_R<v> -b <20xx>_R<v>
+    
+
+    ## generate en_US.UTF-8 locale
+    echo "LC_ALL=en_US.UTF-8" >> /etc/environment && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && echo "LANG=en_US.UTF-8" > /etc/locale.conf 
+    locale-gen && update-locale LANG=en_US.UTF-8
+    dpkg-reconfigure locales
+    echo "locales changed to en_US.UTF-8 \n" && locale
+
+    ## source bash-completion
+    echo "source /etc/profile.d/bash_completion.sh" >> ~/.bashrc
+
+    ## clear cache
+    apt-get update && apt-get --fix-broken install -y
+    apt-get autoremove -y
+    apt-get clean
+    
+
+%runscript
+    # print out system details
+    if [ -f /etc/os-release ]; then
+            . /etc/os-release
+            echo "Debian Distro: $NAME $VERSION"
+    fi
+    echo "Environment: "
+    echo "  TZ:\t\t$TZ\n  TERM:\t\t$TERM\n  LC_ALL:\t\t$LAC_ALL\n  LANG:\t\t$LANG\n"
+    
+    exec /bin/bash
+    
+
+#%test
+#    Test for 
+#         Linaro
+#         U-boot
+
+
+%help
+    This is a container to setup U-Boot tools.
+    DISTRO: Ubuntu 20.04 LTS (Foccal Fossa) 
+    U-boot tools 2024.1
+    
