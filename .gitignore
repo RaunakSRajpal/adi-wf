@@ -5,10 +5,11 @@
 
 ## directory
 build/**/
-*/**/linux-adi
-*/**/hdl
+**/linux-adi
+**/hdl
 pl-proj
 BIN_pkg
+#### Vivado dirs ####
 sysmod_rootfs
 *.cache
 *.hw
@@ -23,11 +24,15 @@ ipcache
 
 ## Export files
 *.xsa
-*dtb
+*.dtb
+
+## Boot Images
 uImage
+zImage
+*.ub
 
 ## simulation results
-*/**/*.sim/**/xsim/
+**/*.sim/**/xsim/
 # *.sim\**\xsim\
 !*.wcfg
 !*.coe
