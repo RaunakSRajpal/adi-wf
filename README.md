@@ -1,21 +1,3 @@
-<head>
-  <style type="text/css">
-    .tree {
-      font-family: monospace;
-      line-height: 1.5;
-      padding: 0.8em 1em;
-      background-color: transparent;
-    }
-    .tree a { text-decoration: none; }
-    .DIR  { color: #6cb6ff; font-weight: bold; }
-    .NORM { color: inherit; }
-    .EXEC { color: #7ee787; }
-    .LINK { color: aqua; }
-  </style>
-</head>
-
-
-
 # adi-wf
 
 This repository is a design workflow for building and deploying  specific projects based on evaluation boards supported by [Analog Devices, Inc](https://wiki.analog.com/resources/eval/user-guides#fmc_compatible_boards). The flow tools are designed for complete bring up of the evaluation board. This repo provides automation scripts and tools, HDL IP support, device drivers, and containerized build tooling.
@@ -61,6 +43,22 @@ More details are provided in the sections following [--].
 
 After all the required builds are complete, the adi-wf root directory, which will be called workspace or **WS** should look like the directory tree shown below :
 
+
+<head>
+  <style type="text/css">
+    .tree {
+      font-family: monospace;
+      line-height: 1.5;
+      padding: 0.8em 1em;
+      background-color: transparent;
+    }
+    .tree a { text-decoration: none; }
+    .DIR  { color: #6cb6ff; font-weight: bold; }
+    .NORM { color: inherit; }
+    .EXEC { color: #7ee787; }
+    .LINK { color: aqua; }
+  </style>
+</head>
 <body>
 <pre class="tree">
 <a class="DIR">adi-wf/</a>
