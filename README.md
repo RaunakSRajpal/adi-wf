@@ -1,4 +1,4 @@
-# adi-wf
+# adi-wf<br><pre><a class="NORM">Analog Devices Workflow</a></pre>
 
 This repository is a design workflow for building and deploying  specific projects based on evaluation boards supported by [Analog Devices, Inc](https://wiki.analog.com/resources/eval/user-guides#fmc_compatible_boards). The flow tools are designed for complete bring up of the evaluation board. This repo provides automation scripts and tools, HDL IP support, device drivers, and containerized build tooling.
 
@@ -10,7 +10,7 @@ This repository is a design workflow for building and deploying  specific projec
     <!-- - [Project Architecture](#project-architecture) -->
 - [Build Workflow](#build-workflow)
     - [Getting Started](#getting-started)
-    - [Steps](#steps)
+    - [Advanced Tooling](#advanced-tooling)
 - [Device Drivers](#device-drivers)
 - [Containers](#containers)
 - [Resources & References](#resources--references)
@@ -20,81 +20,98 @@ This repository is a design workflow for building and deploying  specific projec
 
 ## Project Overview
 
-This repository supports the complete hardware/software co-design of an SDR system. The design integrates:
+Most of the supported evaluation boards have a single chip housing both an FPGA (**programable logic** or **PL**) and a hardened processor (**processing system** or **PS**) on the same die. This provides for the SoC to be incredibly versatile in handling a wide range of tasks. The **PS** can support a **linux** kernel and application sw (or run a **baremetal/RTOS** on the PS), while the **PL** handles time-critical, parallelizable, and dedicated workloads. The two subsystems communicate over high-bandwidth internal interconnects (**AXI protocol**).
 
-< -- REMOVE -- >
+
+This repository supports the complete hardware/software co-design of an SoM system. The project design integrates:
+
+<!-- < -- REMOVE -- >
 - **ADRV9361-Z7035 SoM** — ADI System-on-Module housing a Zynq-7000 SoC and an RF module (AD9361)
 - **PZSDRCC-BRK-PCB-C** — ADI carrier board for programming and development
-- **ORBGRAND PCB** — Houses the ORBGRAND decoder chip (swappable for future GRAND project revisions)
+- **ORBGRAND PCB** — Houses the ORBGRAND decoder chip (swappable for future GRAND project revisions) -->
 
 [--- FIX THIS ---]
 - **Evaluation Board** — 
     - **dafuq**
 - **Carrier Module/PCB** — 
 
-Most of the supported evaluation boards have a single chip housing both the FPGA (programable logic or **PL**) and the hardened processor (processing system or **PS**) on the same die. This provides for the SoC to be incredibly versatile in 
+
+[-- insert image --]
+```
+┌─────────────────────────────────┐
+│       ADRV9361-Z7035 SoM        │  ← Evaluation Board (SoC + RF)
+│   Zynq-7035 (PS + PL) + AD9361  │
+└────────────────┬────────────────┘
+                 │
+┌────────────────▼────────────────┐
+│     PZSDRCC-BRK-PCB-C           │  ← Carrier Board (I/O expansion)
+└────────────────┬────────────────┘
+                 │
+┌────────────────▼────────────────┐
+│             DUT PCB             │  ← Decoder Board (swappable)
+└─────────────────────────────────┘
+```
+
 
 ### Architecture
+The system is designed in a way to leverage existing support from ADI and Xilinx, and also be able to integrate your custom RTL and/or kernel software on top. 
+The workflow is controlled and configured by two dotenv files, **[`project_setup.env`](./project_setup.env)** and **[`setup.env`](./scripts/setup.env)** (located in scripts/ dir). Every script and tool in the repo sources its configs from these, hence they **must remain static** for the complete workflow. 
 
 
-> the *`hdl/`* and *`linux-adi/`* directories are cloned respectively from the [analogdevicesinc/**hdl**](https://github.com/analogdevicesinc/hdl) and [analogdevicesinc/**linux**](https://github.com/analogdevicesinc/linux) repos. These provide support for several SoM and FMC evaluation boards. Check the section on related [repos](#related-repositories) for more information.
+  -  **project_setup.env** : All user configurations for the build processes must be set from this file.
+  -  **setup.env** : This contains all the system level paths, directory structure, and dependency source paths.
 
-More details are provided in the sections following [--].
-
-After all the required builds are complete, the adi-wf root directory, which will be called workspace or **WS** should look like the directory tree shown below :
+> **NOTE :** It is advised **NOT** to edit `setup.env` file, since this can break the build flow. Edit only if you're changing certain dependency and/or system paths for your host machine. More information on how to edit is provided inside the file.
 
 
-<head>
-  <style type="text/css">
-    .tree {
-      font-family: monospace;
-      line-height: 1.5;
-      padding: 0.8em 1em;
-      background-color: transparent;
-    }
-    .tree a { text-decoration: none; }
-    .DIR  { color: #6cb6ff; font-weight: bold; }
-    .NORM { color: inherit; }
-    .EXEC { color: #7ee787; }
-    .LINK { color: aqua; }
-  </style>
-</head>
+#### **__Project :__**
+
+The workflow operates on individual **_"projects"_**, which are defined inside `project_setup.env`. Each project encapsulates both the PL based hardware and its supporting firmware (or baremetal) code. The final binaries are available in `BIN_pkg/<my_project>` directory once the build is complete.
+
+The HDL board projects, once built, can be found inside **`pl-hdl/<my_project>/`**. The built project directory must be named to end in ``<*_build>``. Custom RTL should be added in the same directory (**`pl-hdl/<my_project>/`**) inside dir named `srcs` and constraint files inside `constr`. Check the [WS tree](#ws-tree-) for complete directory tree.
+
+> If you are running the workflow for the first time directly go to [Getting Started](#getting-started), or checkout [Advanced Tooling](#advanced-tooling) if you need detailed explanation of the build process.
+
+<!-- More details are provided in the sections following [--]. -->
+
+After all the required builds are complete, the adi-wf root directory, which will be called workspace or **WS** should look like the directory tree shown below. The 
+
+#### **__WS Tree :__**
+
 <body>
 <pre class="tree">
-<a class="DIR">adi-wf/</a>
-├── <a class="DIR">BIN_pkg/</a>		------------------->	flow completion pkg
-│   ├── <a class="DIR">[ required dirs ]</a>
-│   └── <a class="NORM">[ required files ]</a>
-├── <a class="DIR">build/</a>           ----------------------->	logs, build dirs for 
-│   ├── <a class="DIR">logs</a>                                     individual projects
-│   ├── <a class="DIR">project-1</a>
-│   |   ├── <a class="DIR">BOOT</a>
-│   |	├── <a class="DIR">sysmod_rootfs</a>
+<a class="DIR"><b>adi-wf/</b></a>
+├── <a class="DIR"><b>BIN_pkg/</b></a>		------------------->	flow completion pkg
+│   ├── <a class="DIR"><b>project-1</b></a>
+│   |   └── <a class="NORM">[ pkg files ]</a>
+|   └── <a class="DIR"><b>project-2</b></a>
+│       └── <a class="NORM">[ pkg files ]</a>
+├── <a class="DIR"><b>build/</b></a>           ----------------------->	logs, build dirs for 
+│   ├── <a class="DIR"><b>logs</b></a>                                     each project
+│   ├── <a class="DIR"><b>project-1</b></a>
+│   |   ├── <a class="DIR"><b>BOOT</b></a>
+│   |	├── <a class="DIR"><b>sysmod_rootfs</b></a>
 │   |   └── <a class="NORM">[ build files ]</a>
 |   ...
-|   ...
-│   └── <a class="DIR">project-n</a>
-│   	├── <a class="DIR">BOOT</a>
-│   	├── <a class="DIR">sysmod_rootfs</a>
-│       └── <a class="NORM">[ build files ]</a> 
-├── <a class="DIR">containers/</a>		<!-- ---------------\>	containerized support -->
+│   └── <a class="DIR"><b>project-n</b></a> 
+├── <a class="DIR"><b>containers/</b></a>		<!-- ---------------\>	containerized support -->
 │   ├── <a class="NORM">README.md</a>
 │   ├── <a class="NORM">sing_adiwf_ubuntu20.04.def</a>
 │   └── <a class="EXEC">sing_adiwf_ubuntu20.04.v03.sif</a>
-├── <a class="DIR">drivers/</a>		------------------->	device driver sources
-├── <a class="DIR">hdl/</a>
-├── <a class="DIR">lib/</a>	-------------------->	src files, provide C wrapper functions
-├── <a class="DIR">linux-adi/</a>
-├── <a class="DIR">pl-proj/</a>           ------------------------>     FPGA projects: custom RTL srcs 
-│   ├── <a class="DIR">project-1</a>                -----|              and built bd IPs
-│   |   ├── <a class="DIR">[eval_bd]_build</a>           |
-│   |   ├── <a class="DIR">srcs</a>                      |
-│   |   └── <a class="DIR">constr</a>                    |
-│   └── <a class="DIR">project-2</a>                -----|
-│   |   ├── <a class="DIR">[eval_bd]_build</a>
-│   |   ├── <a class="DIR">srcs</a>
-│   |   └── <a class="DIR">constr</a>
-├── <a class="DIR">scripts/</a>		------------------->	automation scripts
+├── <a class="DIR"><b>drivers/</b></a>		------------------->	device driver sources
+├── <a class="DIR"><b>hdl/</b></a>
+├── <a class="DIR"><b>lib/</b></a>	-------------------->	src files, provide C wrapper functions
+├── <a class="DIR"><b>linux-adi/</b></a>
+├── <a class="DIR"><b>pl-proj/</b></a>           ---------------+-------->     FPGA projects: custom RTL srcs 
+│   ├── <a class="DIR"><b>project-1</b></a>                -----|              and built bd IPs
+│   |   ├── <a class="DIR"><b>[eval_bd]_build</b></a>           |
+│   |   ├── <a class="DIR"><b>srcs</b></a>                      |
+│   |   └── <a class="DIR"><b>constr</b></a>                    |
+│   └── <a class="DIR"><b>project-2</b></a>                -----|
+│   |   ├── <a class="DIR"><b>[eval_bd]_build</b></a>
+│   |   ├── <a class="DIR"><b>srcs</b></a>
+│   |   └── <a class="DIR"><b>constr</b></a>
+├── <a class="DIR"><b>scripts/</b></a>		------------------->	automation scripts
 │   ├── <a class="NORM">gen_boot-bin.sh</a>
 │   ├── <a class="NORM">init-adi-hdl.sh</a>
 │   ├── <a class="NORM">setup-uboot-proj.sh</a>
@@ -110,20 +127,66 @@ After all the required builds are complete, the adi-wf root directory, which wil
 </body>
 
 ---
+<br>
 
+All the build logs, directories, and temp files can be found inside the [build/](./build) directory. All the tools and automation support are provided inside the [scripts/](./scripts/) directory. Similarly check the [drivers/](./drivers/) dir for device drivers bundled with provided PL devices.
+
+
+> the *`hdl/`* and *`linux-adi/`* directories are cloned respectively from the [analogdevicesinc/**hdl**](https://github.com/analogdevicesinc/hdl) and [analogdevicesinc/**linux**](https://github.com/analogdevicesinc/linux) repos. These provide support for several SoM and FMC evaluation boards. Check the section on related [repos](#related-repositories) for more information.
 
 
 ## Build Workflow
 
 ### Getting Started
-If this is your first time cloning or building the repo, you can follow the steps below to the build and run a prototype project. For more advanced tooling check out [Steps](#steps).
+If this is your first time cloning or building the repo, you can follow the steps below to the build and run a zynq-prototype project. For a more advanced tooling guide check out [Advanced Tooling](#advanced-tooling).
 
-1. **Configure the project**
-    ```bash
-    git
+1.  **Clone the repository**
+    ```shell
+    git clone <repo-link>
     ```
 
-### Steps
+2. **Configure the project**\
+    Open the environment file **`project_setup.env`** and provide the folllowing configs :
+    ```shell
+    EVAL_BD="adrv9361z7035"
+    CARRIER="ccbob_cmos"
+    PART_FAM="zynq"
+    ARCH="arm"
+
+    proj_name="new_project"
+    XVERSION="2024.1"
+
+    DTFILE="xilinx/zynq-adrv9361-z7035-bob.dts"
+    uboot_elf="u-boot_zynq_adrv9361.elf"
+    ```
+    This will configure the settings for a **zynq-7000** board, with **ARM(aarch32)** architecture and linux kernel bring-up. Set **XVERSION** to your Xilinx installation version.
+
+3.  **Run the Build scripts**
+    > Run the scripts in the below fixed order :
+    > -   **setup-uboot-proj.sh —** initializes the linux dir. Builds the kernel image and device-tree
+    > -   **init-adi-proj.sh —** initializes the ADI HDL repo. Builds all the required PL based IPs for the board
+    > -   **gen_boot-bin.sh —** generates the BOOT Binaries for the boot-partition
+
+    ```shell
+    bash scripts/setup-uboot-proj.sh
+    bash scripts/init-adi-hdl.sh
+    bash scripts/gen_boot-bin.sh
+    ```
+
+    > **NOTE:** If you are facing dependency errors/conflicts on host machine, run this step inside the provided [containers](./containers/) (Need to be built first). 
+
+4.  **Flash drive**\
+    If the build process ran successfully to completion, you should see the following files packaged inside the directory **`BIN_pkg`**.
+    -   BOOT.BIN
+    -   devicetree.dtb
+    -   uImage(.ub) or zImage
+    +   **rootfs/**
+    *   uEnv.txt
+    *   
+    
+    Copy or move the directory **rootfs** in the ROOT partition and the other 3 files in the BOOT partition of the flash drive/SD-card.
+
+### Advanced Tooling
 
 1. **Clone the repository**
    ```bash
@@ -194,7 +257,7 @@ singularity build --fakeroot <image-name>.sif containers/<definition-file>.def
 | Petalinux UG1144 (NFS workaround) | Appendix-L, Ch7 |
 
 
-## Related Repositories
+## Related ADI Repositories
 
 ### HDL
 | Repo | Branch |
@@ -236,3 +299,21 @@ singularity build --fakeroot <image-name>.sif containers/<definition-file>.def
 | [analogdevicesinc/wiki-scripts](https://github.com/analogdevicesinc/wiki-scripts) | Wiki automation scripts |
 
 ---
+---
+
+> [CSS render: ignore] 
+<head>
+  <style type="text/css">
+    .tree {
+      font-family: monospace;
+      line-height: 1.5;
+      padding: 0.8em 1em;
+      background-color: transparent;
+    }
+    .tree a { text-decoration: none; }
+    .DIR  { color: #6cb6ff; font-weight: bold; }
+    .NORM { color: inherit; }
+    .EXEC { color: #7ee787; }
+    .LINK { color: aqua; }
+  </style>
+</head>
