@@ -147,6 +147,10 @@ touch $LOGFILE && > $LOGFILE
                 
                 # run tcl script to export hardware(.xsa) file
                 # \\ TODO: \\
+                vivado -mode batch \
+                        -nolog -nojournal \
+                        -source gen_xsa.tcl \
+                        -tclargs ${HDL_PROJ} -f
         )
 
 

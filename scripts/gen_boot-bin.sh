@@ -191,11 +191,11 @@ touch $LOGFILE && > $LOGFILE
 
 
 ## Generate SDcard files
-        status "Generated all files for boot: ${OUTPUT_DIR}" | tee $LOGFILE 2>&1
+        status "Generated all files for build-boot: $(ls -w0 ${OUTPUT_DIR})" | tee $LOGFILE 2>&1
         status "Files for bootable media can be found in directory: ${PKG_BOOT}" | tee $LOGFILE 2>&1
 
-        mkdir -p $PKG_BOOT/${proj_name}
-        cp -f ${OUTPUT_DIR}/BOOT.BIN $PKG_BOOT
+        mkdir -p $PKG_BOOT/
+        cp -f ${OUTPUT_DIR}/BOOT.BIN $PKG_BOOT/
 
 
     #---- build linux script ----

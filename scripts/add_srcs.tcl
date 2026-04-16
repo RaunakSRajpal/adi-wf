@@ -3,8 +3,12 @@
 # Cmpany:   WISE Circuits Lab, Boston University
 # 
 # Brief:    Includes all source and constraint files in their 
-#           respective filesets. 
-#           Expects to be run on the project root directory
+#           respective filesets. Expects to be run on the project 
+#           root directory. All source files must be inside srcs dir
+#           and constraints in constr dir.
+# 
+# Usage:    add_src.tcl <project_dir>
+#   project_dir		(REQ)	project root dir
 ####################################################################
 
 
@@ -66,20 +70,22 @@
     }
 
 
-    # .xpr file
-    set xpr_file [glob -nocomplain $hdl_build_dir/*.xpr]     # Path to the .xpr project file
+    # .xpr vivado project file
+    set xpr_files [glob -nocomplain $hdl_build_dir/*.xpr]     # Path to the .xpr project file
 
-    if {[llength $xpr_file] == 0} {
+    if {[llength $xpr_files] == 0} {
         error "No .xpr project file found in: $hdl_build_dir"
         return
-    } elseif {[llength $xpr_file] > 1} {
+    } elseif {[llength $xpr_files] > 1} {
         error "Multiple .xpr project files found in: $hdl_build_dir" \
-        "Only one Vivado project file(.xpr) supported per vivado-build directory"
+        "Only one Vivado project file(.xpr) supported per vivado-build directory\n\t\t Found: $xpr_files"
         return
     }
 
-    status "HDL build directory located: $hdl_build_dir"
-    open_project [lindex $xpr_file 0]
+    set xpr_file [lindex $xpr_files 0]
+    status "Vivado project file(.xpr) located: $xpr_file"
+    status "Opening Vivado project: $xpr_file"
+    open_project $xpr_file
 
 
     # Recursively find all source files
@@ -95,7 +101,7 @@
 
         if {[llength $src_files] == 0} {
             warning "No source files found in: $srcs_dir" \
-            ""
+            "custom RTL must be packaged inside \[$proj_dir/srcs\] directory\n\t\t Found: $src_files"
         }
     }   
     
@@ -138,8 +144,9 @@
     update_compile_order -fileset sim_1
     update_compile_order -fileset constrs_1
 
-    save_project_as [lindex $xpr_file 0]
-    status "Project saved: [lindex $xpr_file 0]"
+    save_project_as $xpr_file
+    status "Project saved: $xpr_file
+    close_project
 
 exit 0
 

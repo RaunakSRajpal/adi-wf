@@ -214,6 +214,6 @@ touch $LOGFILE && > $LOGFILE
         mkdir -p $PKG_BOOT/${proj_name}
 
         cp -f arch/arm/boot/$IMG_NAME $PKG_BOOT && \
-        cp -f arch/arm/boot/dts/$DTFILE $PKG_BOOT && return_line && \
+        cp -f arch/arm/boot/dts/$DTFILE $PKG_BOOT/devicetree.dtb && return_line && \
         status "BUILD SUCCESS: boot files generated: $IMG_NAME $DTFILE"
 
