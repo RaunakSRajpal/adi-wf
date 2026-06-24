@@ -34,7 +34,7 @@ The provided scripts and tools can be used to automate many of the tasks associa
 
 &#x20; <tr>
 
-&#x20;   <td><code>setup-uboot-proj.sh</code></td>
+&#x20;   <td><code>dev-mem\_acc</code></td>
 
 &#x20;   <td>
 
@@ -64,7 +64,7 @@ The provided scripts and tools can be used to automate many of the tasks associa
 
 &#x20; <tr>
 
-&#x20;   <td><code>init-adi-hdl.sh</code></td>
+&#x20;   <td><code>dma-pl</code></td>
 
 &#x20;   <td>
 
@@ -94,7 +94,7 @@ The provided scripts and tools can be used to automate many of the tasks associa
 
 &#x20; <tr>
 
-&#x20;   <td><code>gen\_boot-bin.sh</code></td>
+&#x20;   <td><code>dma\_irq</code></td>
 
 &#x20;   <td>
 
@@ -124,7 +124,7 @@ The provided scripts and tools can be used to automate many of the tasks associa
 
 &#x20; <tr>
 
-&#x20;   <td><code>init-adi-hdl.sh</code></td>
+&#x20;   <td><code>gpio</code></td>
 
 &#x20;   <td>
 
@@ -154,7 +154,7 @@ The provided scripts and tools can be used to automate many of the tasks associa
 
 &#x20; <tr>
 
-&#x20;   <td><code>init-adi-hdl.sh</code></td>
+&#x20;   <td><code>gpio\_dummy</code></td>
 
 &#x20;   <td>
 
