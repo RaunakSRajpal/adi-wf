@@ -1,12 +1,12 @@
-\# Drivers
+# Drivers
 
 
 
-The provided scripts and tools can be used to automate many of the tasks associated with the workflow or individual builds.
+The provided drivers and configuration files ensure hardware compatibility and communication with the operating system.
 
 
 
-\## Build Drivers
+## Build Drivers
 
 <!-- 
 
@@ -42,18 +42,6 @@ The provided scripts and tools can be used to automate many of the tasks associa
 
 &#x20;     <br><br>
 
-&#x20;     <b>Dependencies:</b>
-
-&#x20;     <ul>
-
-&#x20;       <li><b>Architecture:</b> <i>(required)</i> ...</li><br>
-
-&#x20;       <li><b>Xilinx Vivado/Vitis:</b> <i>(optional)</i> ...</li><br>
-
-&#x20;       <li><b>GCC Cross-compiler:</b> <i>(required)</i> ...</li>
-
-&#x20;     </ul>
-
 &#x20;   </td>
 
 &#x20; </tr>
@@ -71,18 +59,6 @@ The provided scripts and tools can be used to automate many of the tasks associa
 &#x20;     Handles the register‑level operations required for DMA-based I/O.
 
 &#x20;     <br><br>
-
-&#x20;     <b>Dependencies:</b>
-
-&#x20;     <ul>
-
-&#x20;       <li>**Architecture:</b> <i>** *(required)* </i>...</li><br>
-
-&#x20;       <li>**Xilinx Vivado/Vitis:</b> <i>***(optional)* </i>...</li><br>
-
-&#x20;       <li>**GCC Cross-compiler:**</b> <i>*(required)* </i>...</li>
-
-&#x20;     </ul>
 
 &#x20;   </td>
 
@@ -102,18 +78,6 @@ The provided scripts and tools can be used to automate many of the tasks associa
 
 &#x20;     <br><br>
 
-&#x20;     <b>Dependencies:</b>
-
-&#x20;     <ul>
-
-&#x20;       <li>**Architecture:</b> <i>***(required)* </i>...</li><br>
-
-&#x20;       <li>**Xilinx Vivado/Vitis:</b> <i>***(optional)* </i>...</li><br>
-
-&#x20;       <li>**GCC Cross-compiler:</b> <i>***(required)*</i>...</li>
-
-&#x20;     </ul>
-
 &#x20;   </td>
 
 &#x20; </tr>
@@ -131,18 +95,6 @@ The provided scripts and tools can be used to automate many of the tasks associa
 &#x20;     Implements the register‑level interface and operations for GPIO. 
 
 &#x20;     <br><br>
-
-&#x20;     **Dependencies:**
-
-&#x20;     <ul>
-
-&#x20;       <li>**Architecture:**</b> <i>*(required)*</i>...</li><br>
-
-&#x20;       <li>**Xilinx Vivado/Vitis:**</b> <i>*(optional)*</i>...</li><br>
-
-&#x20;       <li>**GCC Cross-compiler:**</b> <i>*(required)*</i>...</li>
-
-&#x20;     </ul>
 
 &#x20;   </td>
 
@@ -162,18 +114,6 @@ The provided scripts and tools can be used to automate many of the tasks associa
 
 &#x20;     <br><br>
 
-&#x20;     **Dependencies:**
-
-&#x20;     <ul>
-
-&#x20;       <li>**Architecture:**</b> <i>*(required)*</i>...</li><br>
-
-&#x20;       <li>**Xilinx Vivado/Vitis:**</b> <i>*(optional)*</i>...</li><br>
-
-&#x20;       <li>**GCC Cross-compiler:**</b> <i>*(required)*</i>...</li>
-
-&#x20;     </ul>
-
 &#x20;   </td>
 
 &#x20; </tr>
@@ -189,10 +129,6 @@ The provided scripts and tools can be used to automate many of the tasks associa
 \---
 
 
-
-
-
-\## Auxiliary tools
 
 
 
