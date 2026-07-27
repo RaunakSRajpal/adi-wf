@@ -28,6 +28,26 @@ proc log_write {msg} {
 }
 
 # ----------------------------------------------------------------
+# glob_recursive: procedure to filter/glob files recursively
+# ----------------------------------------------------------------
+proc glob_recursive {dir patterns} {
+    set result {}
+
+    # Match files in the current directory
+    foreach pattern $patterns {
+        lappend result {*}[glob -nocomplain -directory $dir -- $pattern]
+    }
+
+    # Recurse into subdirectories
+    foreach sub [glob -nocomplain -directory $dir -types d -- *] {
+        lappend result {*}[glob_recursive $sub $patterns]
+    }
+
+    return $result
+}
+
+
+# ----------------------------------------------------------------
 # Logging procedures/functions
 # ----------------------------------------------------------------
 proc usage {msg} {
@@ -49,7 +69,7 @@ proc status {msg} {
 
 proc warning {msg detail} {
     log_write "\[WARNING\]\t$msg"
-    log_write "\t$detail"
+    log_write "\t\t$detail"
 }
 
 proc return_line {} {

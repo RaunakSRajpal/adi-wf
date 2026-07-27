@@ -6,7 +6,7 @@ set -e
 # Company:  WISE Circuits Lab, Boston University
 # 
 # Brief:    Builds HDL project for supported SoC/FMC boards from ADI
-#           and sources them inside a vivado project.
+#           and sources them inside a vivado project. Exports .xsa
 # 
 #           Can also be used to build all ADI IPs and package them
 #           inside the Vivado IP repository (set EVAL_BD="library")
@@ -17,8 +17,8 @@ set -e
 # CARRIER=${3:-"ccbob_cmos"}
 # hdl_branch=${4:-"hdl_2023_r2"}        # "main"}
 
-WS="$(dirname "$0")/../"
-LOGFILE=${ADI_DIR}/build/logs/setup-HDL.log
+WS="$(realpath "$(dirname $0)/../")"
+LOGFILE=${WS}/build/logs/init_HDL.log
 touch $LOGFILE && > $LOGFILE
 
 
@@ -81,8 +81,10 @@ touch $LOGFILE && > $LOGFILE
         (( (XVIVADO_MISSING ^ XVITIS_MISSING) == 1 )) && \
                 error "$0: Xilinx Vivado or Vitis(SDK) $XVERSION installation directory not found" \
                 "setup.env: Both XVIVADO and XVITIS are essential HDL build requirements. check README.md for more information. \n\t\tXVIVADO: [${XVIVADO}]\n\t\tXVITIS: [${XVITIS}]"
-        (( XVIVADO_MISSING == 1 && XVITIS_MISSING == 1 )) && \
+        (( XVIVADO_MISSING == 1 && XVITIS_MISSING == 1 )) && {
                 SCC_FALLBACK=1
+                export XILINXD_LICENSE_FILE=2100@XilinxLM.bu.edu
+        }
         
         . ${WS}/scripts/find_xilinx.sh
         return_line && which vivado | tee -a $LOGFILE 2>&1
@@ -125,40 +127,57 @@ touch $LOGFILE && > $LOGFILE
         export ADI_IGNORE_VERSION_CHECK=1
         (
                 cd ${XPR_ROOT} && \
-                make -j5 | tee -a $LOGFILE 2>&1
+                make -j6 | tee -a $LOGFILE 2>&1
                 status "Project board: $EVAL_BD-$CARRIER: build complete"
 
 	        mkdir -p ${HDL_PROJ}/srcs
                 mkdir -p ${HDL_PROJ}/constr
-                export ${HDL_PROJ}
+                export WS HDL_PROJ LOGFILE
 
                 # this extracts the directory name of the hdl-build
                 # cp -r $(dirname "${XSA_FILE}") ${HDL_PROJ} && \
                 # HDL_BUILD_DIR=${HDL_PROJ}/$(basename $(dirname "${XSA_FILE}"))
-                cp -r ${XPR_ROOT} ${HDL_PROJ} && \
-                mv -b ${HDL_PROJ}/$(basename ${XPR_ROOT}) ${HDL_PROJ}/${EVAL_BD}-${CARRIER}-${proj_name}_build
-                export $LOGFILE
+                
+		# guard to protect project overwrite; refreshes existing project
+		HDL_BUILD_DIR=$(dirname ${XSA_FILE})
+		if [ -d "${HDL_BUILD_DIR}" ] ; then
+			status "Found previous HDL build directory inside project: ${HDL_BUILD_DIR}" \
+			"\t\t refresh project: $(basename ${HDL_BUILD_DIR})"
+		else
+			status "No existing HDL board projects found. Loading project from HDL dir (${HDL_DIR})" \
+			"\t\t Source vivado design project: ${XPR_ROOT}"
+			cp -r ${XPR_ROOT} ${HDL_PROJ} && \
+                	mv -b ${HDL_PROJ}/$(basename ${XPR_ROOT}) ${HDL_BUILD_DIR}
+		fi
 
+                status "Loading PL device sources..."
+                status "Starting Vivado project: " \
+                        "$(basename ${XPR_ROOT})"
+                
                 # run tcl script to load srcs in .xpr project
                 vivado -mode batch \
-                        -nolog -nojournal \
-                        -source add_srcs.tcl \
+                        -nolog -nojournal -notrace \
+                        -source ${WS}/scripts/add_srcs.tcl \
                         -tclargs ${HDL_PROJ}
                 
                 # run tcl script to export hardware(.xsa) file
-                # \\ TODO: \\
+                # \\ TODO: support multiple build dir \\
                 vivado -mode batch \
-                        -nolog -nojournal \
-                        -source gen_xsa.tcl \
+                        -nolog -nojournal -notrace \
+                        -source ${WS}/scripts/gen_xsa.tcl \
                         -tclargs ${HDL_PROJ} -f
+                
+                status "Vivado hardware file(.xsa) exported \n\t\t(file: $XSA_FILE)"
         )
 
 
 ## Build ADI IP cores
-        if [ "$EVAL_BD" == "library" ] ; then (
+        if [ "$EVAL_BD" == "library" ] ; then
+	    (
                 cd ${HDL_DIR} && \
                 make -C lbrary all | tee -a $LOGFILE 2>&1
                 status "$HDL_DIR/library: build complete"
+
                 ## -- TODO --
                 #--- tcl: add library directory to Vivado IP repository
                 # run tcl script to load srcs in .xpr project
@@ -166,12 +185,15 @@ touch $LOGFILE && > $LOGFILE
                 #         -nolog -nojournal \
                 #         -source <>.tcl \
                 #         -tclargs ${HDL_BUILD_DIR}
-        )
+            )
+	fi
 
 
+exit 0
 
 
 # bootstrapping a bash/tcl script 
     # #!/bin/sh
     # the next line restarts using tclsh \
     # exec tclsh "$0" "$@"
+

@@ -13,7 +13,7 @@
 
 
 # Parse and check argument/env variables passed from shell
-    source housekeeping.tcl
+    source $env(WS)/scripts/housekeeping.tcl
 
     # parse arguments
     if {[llength $argv] < 1} {
@@ -27,8 +27,7 @@
         }
 
         set proj_dir $env(HDL_PROJ)
-        set srcs_dir $proj_dir/srcs
-        set constr_dir $proj_dir/constr
+
     } else {
         set proj_dir [lindex $argv 0]
     }
@@ -38,6 +37,8 @@
         "HDL_PROJ: required to export from shell env"
         return
     }
+	set srcs_dir $proj_dir/srcs
+	set constr_dir $proj_dir/constr
 
 
     # Vivado build directory
@@ -57,54 +58,62 @@
 
 
     # RTL sources/constr directory
-    set no_srcs 0; set no_constr 0
+    set no_srcs_dir 0; set no_constr_dir 0
     if {![file isdirectory $srcs_dir]} {
         warning "No source directory found" \
         "custom RTL must be packaged inside \[$proj_dir/srcs\] directory"
-        set no_srcs 1
+        set no_srcs_dir 1
     }
     if {![file isdirectory $constr_dir]} {
         warning "No constraints directory found" \
         "custom constraint files(xdc/sdc) must be packaged inside \[$proj_dir/constr\] directory"
-        set no_constr 1
+        set no_constr_dir 1
     }
 
 
     # .xpr vivado project file
-    set xpr_files [glob -nocomplain $hdl_build_dir/*.xpr]     # Path to the .xpr project file
+    set xpr_files [glob -nocomplain $hdl_build_dir/*.xpr];		# Path to the .xpr project file
 
     if {[llength $xpr_files] == 0} {
         error "No .xpr project file found in: $hdl_build_dir"
         return
     } elseif {[llength $xpr_files] > 1} {
         error "Multiple .xpr project files found in: $hdl_build_dir" \
-        "Only one Vivado project file(.xpr) supported per vivado-build directory\n\t\t Found: $xpr_files"
+        "Only one Vivado project file(.xpr) supported per vivado-build directory\n\t\t (Found: $xpr_files)"
         return
     }
 
     set xpr_file [lindex $xpr_files 0]
-    status "Vivado project file(.xpr) located: $xpr_file"
-    status "Opening Vivado project: $xpr_file"
-    open_project $xpr_file
+	set xpr_filename [file tail $xpr_file]
+    status "Vivado project file(.xpr) located \n\t\t(file $xpr_file)"
+    # status "Opening Vivado project: $xpr_filename \n\t\t(file: $xpr_file)"
+    # open_project $xpr_file
 
 
     # Recursively find all source files
-    if {!$no_srcs} {
-        set src_files [glob -nocomplain -recurse \
-            $srcs_dir/*.v       \
-            $srcs_dir/*.sv      \
-            $srcs_dir/*.vhd     \
-            $srcs_dir/*.vhdl    \
-            $srcs_dir/*.xdc     \
-            $srcs_dir/*.sdc     \
-        ]
+    if {!$no_srcs_dir} {
+        set src_files [glob_recursive $srcs_dir {
+			*.v		\
+			*.sv	\
+			*.vhd	\
+			*.vhdl	\
+			*.xdc	\
+			*.sdc	\
+		}]
 
         if {[llength $src_files] == 0} {
             warning "No source files found in: $srcs_dir" \
-            "custom RTL must be packaged inside \[$proj_dir/srcs\] directory\n\t\t Found: $src_files"
+            "custom RTL must be packaged inside \[$proj_dir/srcs\] directory\n\t\t (Found: $src_files)"
         }
-    }   
-    
+    }
+
+
+    # Recursively find all constraint files (XDC/SDC)
+    if {!$no_constr_dir} {
+        lappend constr_files {*}[glob -nocomplain -directory $constr_dir -- *.xdc]
+        lappend constr_files {*}[glob -nocomplain -directory $constr_dir -- *.sdc]
+    }
+
 
 
 # Add files to the project
@@ -112,7 +121,7 @@
     set tb_files {}
     set des_src_files {}
 
-    # filter out tb/constr files
+    # filter src/tb/constr files
     foreach f $src_files {
         set ext [file extension $f]
         set tail [file tail $f]
@@ -126,26 +135,43 @@
     }
 
 
-    # constraint files (XDC/SDC)
-    lappend constr_files [glob $constr_dir/*{.xdc,.sdc}]
-    add_files -fileset constrs_1 $constr_files
-    status "Added constraint files: $constr_files"
+    # Include source files in Vivado project (.xpr)
+    if {[llength $des_src_files] == 0} {
+        warning "pldev_srcs: No files found." \
+        "No recognised source files were found at: $srcs_dir"
+    } else {
+        add_files -fileset sources_1 $des_src_files
+        status "Include source files: $des_src_files"
+    }
 
-    # design and tb source files
-    add_files -fileset sources_1 $des_src_files
-    add_files -fileset sim_1 $tb_files
-    status "Added source files: $des_src_files"
-    status "Added simulation files: $tb_files"
+    if {[llength $tb_files] == 0} {
+        warning "pldev_sim: No files found." \
+        "No recognised testbench(_tb) files were found at: $srcs_dir"
+    } else {
+        add_files -fileset sim_1 $tb_files
+        status "Include simulation files: $tb_files"
+    }
+
+    if {[llength $constr_files] == 0} {
+        warning "pldev_constrs: No files found." \
+        "No recognised constraint files were found at: $srcs_dir or $constr_dir"
+    } else {
+        status "I got till here!! $constr_files"
+        add_files -fileset constrs_1 $constr_files
+        status "Include constraint files: $constr_files"
+    }
 
 
 
-# Update compile order and save project
+# Update compile order and clean exit
+    status "Opening Vivado project: $xpr_filename \n\t\t(file: $xpr_file)"
+    open_project $xpr_file
     update_compile_order -fileset sources_1
     update_compile_order -fileset sim_1
-    update_compile_order -fileset constrs_1
+    # update_compile_order -fileset constrs_1
 
-    save_project_as $xpr_file
-    status "Project saved: $xpr_file
+    # save_project
+    status "Project saved: $xpr_file"
     close_project
 
 exit 0

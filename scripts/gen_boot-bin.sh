@@ -13,8 +13,8 @@ set -e
 # CARRIER=${2:-"ccbob_cmos"}
 # XSA_FILE=${3:-"$HDL_DIR/projects/$EVAL_BD/$CARRIER/system_top.xsa"}
 
-WS="$(dirname "$0")/../"
-LOGFILE=${ADI_DIR}/build/logs/setup-BOOT.log
+WS="$(realpath "$(dirname $0)/../")"
+LOGFILE=${WS}/build/logs/gen_BOOT.log
 touch $LOGFILE && > $LOGFILE
 
 # UBOOT_FILE="${BOOT_DIR}/u-boot_zynq_adrv9361.elf"
@@ -132,10 +132,10 @@ touch $LOGFILE && > $LOGFILE
                 [ -f "$uboot_elf" ] || \
                         error "ELF: u-boot.elf file not found" \
                         "$0: check the u-boot file path in project_setup.env: uboot_elf: [${uboot_elf}]"
-                
-                status "u-boot.elf file located: ${uboot_elf}"
-                export UBOOT_FILE=${BOOT_DIR}/$(basename ${uboot_elf})
-                cp -bu ${uboot_elf} $UBOOT_FILE
+
+		status "u-boot.elf file located: ${uboot_elf}"
+		export UBOOT_FILE=${BOOT_DIR}/$(basename ${uboot_elf})
+		cp -bu ${uboot_elf} $UBOOT_FILE
         fi
 
 

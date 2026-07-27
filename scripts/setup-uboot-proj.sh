@@ -22,8 +22,8 @@ set -e
 # ------------------------------------------------------------------
 
 
-WS="$(dirname "$0")/../"
-LOGFILE="${WS}/build/logs/LOG_build_kernel.log"
+WS="$(realpath "$(dirname $0)/../")"
+LOGFILE="${WS}/build/logs/build_kernel.log"
 touch $LOGFILE && > $LOGFILE
 
 
@@ -132,8 +132,8 @@ touch $LOGFILE && > $LOGFILE
                 else
                         error "$CROSS_COMPILE: specified CC toolchain not found" \
                         "CC: check setup.env [CC path: ${CROSS_COMPILE}]"
-                fi
-        || {
+                fi \
+	|| {
                 # If VITIS is missing, use VIVADO to set cross-compiler
                 # If both VIVADO & VITIS missing, fallback to versions supported by SCC
                 [ "${XVITIS_MISSING}" -eq 1 ] && {
@@ -211,9 +211,9 @@ touch $LOGFILE && > $LOGFILE
         make $DTFILE | tee -a $LOGFILE 2>&1
 
 ## package boot files
-        mkdir -p $PKG_BOOT/${proj_name}
+        mkdir -p $PKG_BOOT
 
         cp -f arch/arm/boot/$IMG_NAME $PKG_BOOT && \
         cp -f arch/arm/boot/dts/$DTFILE $PKG_BOOT/devicetree.dtb && return_line && \
-        status "BUILD SUCCESS: boot files generated: $IMG_NAME $DTFILE"
+        status "BUILD SUCCESS: boot files generated: \n\t\t $IMG_NAME $DTFILE"
 

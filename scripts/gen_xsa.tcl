@@ -13,7 +13,7 @@
 
 
 # Parse and check argument/env variables passed from shell
-    source housekeeping.tcl
+    source $env(WS)/scripts/housekeeping.tcl
 
     # Parse arguments
     if {[llength $argv] < 1} {
@@ -76,7 +76,7 @@
 
 
 	# .xpr vivado project file
-    set xpr_files [glob -nocomplain "$hdl_build_dir/*.xpr"]     # Path to the .xpr project file
+    set xpr_files [glob -nocomplain "$hdl_build_dir/*.xpr"]		; # Path to the .xpr project file
 
     if { [llength $xpr_files] == 0 } {
         error "No .xpr project file found in: $hdl_build_dir" \
@@ -103,6 +103,7 @@
 	if { [get_property PROGRESS $runs] != "100%" || 
 	     [get_property STATUS $runs] != "route_design Complete!" } {
 	    status "Running synthesis..."
+		reset_run synth_1
 	    launch_runs synth_1 -jobs 4
 	    wait_on_run synth_1
 
@@ -111,7 +112,7 @@
 	    wait_on_run impl_1
 	}
 
-	set bit_files [glob -nocomplain "${proj_dir}/${vivado_proj_name}.runs/impl_1/*.bit"]
+	set bit_files [glob -nocomplain "${hdl_build_dir}/${vivado_proj_name}.runs/impl_1/*.bit"]
 	if { [llength $bit_files] == 0 } {
 	    status "Generating bitstream..."
 	    launch_runs impl_1 -to_step write_bitstream -jobs 4
@@ -122,7 +123,7 @@
 
 # Export hardware (.xsa) including bitstream
 	if { [llength $xsa_path] == 0 } {
-		set xsa_path "${proj_dir}/${vivado_proj_name}/system_top.xsa"
+		set xsa_path "${hdl_build_dir}/system_top.xsa"
 	}
 	status "Exporting hardware to: $xsa_path"
 
@@ -135,4 +136,6 @@
 
 	status "Hardware file successfully exported: $xsa_path"
 	close_project
+
+exit 0
 
