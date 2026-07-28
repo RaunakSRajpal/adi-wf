@@ -3,28 +3,33 @@
 *.xpr
 *.sif
 
-## directory
+## Directory
 build/**/
 **/linux-adi
 **/hdl
-pl-proj
+**/pldev
 BIN_pkg
+**/sysmod_rootfs
+
 #### Vivado dirs ####
-sysmod_rootfs
-*.cache
-*.hw
+.Xil
+*.cache/
+*.gen/
+*.hw/
+*.sdk/
+*.srcs/
+*.ip_user_files/
+*.runs/
 .metadata
 *.data
 *.ipdefs
-.Xil
-*.sdk
-*.srcs
-*.ip_user_files
 ipcache
 
 ## Export files
 *.xsa
 *.dtb
+*.hwh
+mem_init_sys.txt
 
 ## Boot Images
 uImage
@@ -32,6 +37,7 @@ zImage
 *.ub
 
 ## simulation results
+**/sim/
 **/*.sim/**/xsim/
 # *.sim\**\xsim\
 !*.wcfg
@@ -114,3 +120,4 @@ dkms.conf
 ## ip
 ipshared
 ipcfg
+**/ip/
