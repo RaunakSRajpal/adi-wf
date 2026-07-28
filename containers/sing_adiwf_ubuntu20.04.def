@@ -52,12 +52,14 @@ Stage: build
     apt-get install -y gcc gcc-aarch64-linux-gnu                                # install gcc cross compiler for ARMv8 architecture
     echo "uboot tools installedL: " && mkimage -V
 
+    apt-get install -y libtinfo5
+
     ## Install Linaro toolchains at /lib/
-    cd /lib/ && wget https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabi/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz
-    tar -xvf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz && rm -rf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz
-    export CROSS_COMPILE=/lib/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-
-    echo && echo "Linaro toolchain installed" 
-    echo "VERSION: " && ${CROSS_COMPILE}gcc --version
+    # cd /lib/ && wget https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabi/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz
+    # tar -xvf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz && rm -rf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz
+    # export CROSS_COMPILE=/lib/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-
+    # echo && echo "Linaro toolchain installed" 
+    # echo "VERSION: " && ${CROSS_COMPILE}gcc --version
 
     ## Install ADI Linux repository into /opt/uboot/
     # cd /opt/uboot/
@@ -95,13 +97,14 @@ Stage: build
     
 
 #%test
-#    Test for 
-#         Linaro
-#         U-boot
+#	Test for :
+		# - Linaro
+		# - U-boot
 
 
 %help
-    This is a container to setup U-Boot tools.
+    This is a container to setup ADI-WF tools.
     DISTRO: Ubuntu 20.04 LTS (Foccal Fossa) 
-    U-boot tools 2024.1
+    - U-boot tools 2024.1 (includes mkimage)
+	- Linaro GCC toolchain 7.5.0
     
