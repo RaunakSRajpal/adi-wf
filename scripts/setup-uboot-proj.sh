@@ -92,12 +92,17 @@ touch $LOGFILE && > $LOGFILE
                         ;;
                     *)
                         status "Cloning from ADI repository..."
-                        git clone https://github.com/analogdevicesinc/linux.git \
-                            --no-single-branch --depth=10 \
-                            -- linux | tee -a $LOGFILE 2>&1
-                        mv -b linux/ linux-adi/
-                        status "Linux repository cloned"
-                        git checkout $lnx_branch
+                        (
+				git clone ${lnx_git_url} \
+				    --no-single-branch --depth=10 \
+				    -- linux | tee -a $LOGFILE 2>&1
+				mv -b linux/ ${LINUX_DIR}/
+				cd ${LINUX_DIR}/
+				git checkout $lnx_branch
+				status "Linux repository cloned successfully"
+                        ) || \
+                        	error "Failed to clone Linux repository: dir: ${LINUX_DIR}" \
+				"(git url: ${lnx_git_url})"
                         ;;
                 esac
         }

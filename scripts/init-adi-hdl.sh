@@ -105,16 +105,21 @@ touch $LOGFILE && > $LOGFILE
                         exit 1
                         ;;
                     *)
-                        status "Cloning from ADI repository..."
-                        git clone https://github.com/analogdevicesinc/hdl.git \
-                            --no-single-branch --depth=10 \
-                            -- hdl | tee -a $LOGFILE 2>&1
-                        # mv -b hdl/ hdl-adi/
-                        status "HDL repository cloned"
-                        git checkout $hdl_branch
-                        ;;
-                esac
-        }
+			status "Cloning from ADI repository..."
+			(
+				git clone ${hdl_git_url} \
+				    --no-single-branch --depth=10 \
+				    -- hdl | tee -a $LOGFILE 2>&1
+				# mv -b hdl/ ${HDL_DIR}/
+				cd ${HDL_DIR}/
+				git checkout $hdl_branch
+				status "HDL repository cloned"
+			) || \
+				error "Failed to clone ADI-hdl repository: dir: ${HDL_DIR}" \
+				"(git url: ${hdl_git_url})"
+			;;
+		esac
+	}
 
         
         # HDL board build directory
