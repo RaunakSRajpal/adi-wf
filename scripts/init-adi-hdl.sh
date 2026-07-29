@@ -19,6 +19,7 @@ set -e
 
 WS="$(realpath "$(dirname $0)/../")"
 LOGFILE=${WS}/build/logs/init_HDL.log
+mkdir -p ${WS}/build/logs/
 touch $LOGFILE && > $LOGFILE
 
 

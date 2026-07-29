@@ -24,6 +24,7 @@ set -e
 
 WS="$(realpath "$(dirname $0)/../")"
 LOGFILE="${WS}/build/logs/build_kernel.log"
+mkdir -p ${WS}/build/logs/
 touch $LOGFILE && > $LOGFILE
 
 
