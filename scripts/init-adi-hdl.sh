@@ -122,11 +122,11 @@ touch $LOGFILE && > $LOGFILE
 	}
 
         
-        # HDL board build directory
-        [ -d "${HDL_DIR}/projects/$EVAL_BD/$CARRIER" ] || \
-        	error "$0: ADI project board not found" \
-                "EVAL_BD/CARRIER: must be defined in project_setup.env [${WS}/project_setup.env]"
-        
+	# HDL board build directory
+	[ -d "${HDL_DIR}/projects/${EVAL_BD}/${CARRIER}" ] || \
+		error "$0: ADI project board not found" \
+		"EVAL_BD/CARRIER: must be defined in project_setup.env [${WS}/project_setup.env]"
+	
 
 
 ## Build HDL project 

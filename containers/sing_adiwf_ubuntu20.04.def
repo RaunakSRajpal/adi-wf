@@ -45,12 +45,13 @@ Stage: build
     python3-pkg-resources python3-pycryptodome python3-pyelftools \
     python3-pytest python3-pytest-xdist python3-sphinxcontrib.apidoc \
     python3-sphinx-rtd-theme python3-subunit python3-testtools \
-    python3-venv rsync swig software-properties-common patchutils xterm zlib1g-dev
+    python3-venv rsync swig software-properties-common patchutils xterm zlib1g-dev \
+    xvfb x11-utils x11-apps
 
     apt-get update && apt-get install -y cmake                                  # install cmake tools
     apt-get install -y u-boot-tools                                             # u-boot-tools includes the mkimage pkg (required)
     apt-get install -y gcc gcc-aarch64-linux-gnu                                # install gcc cross compiler for ARMv8 architecture
-    echo "uboot tools installedL: " && mkimage -V
+    echo "uboot tools installed: " && mkimage -V
 
     apt-get install -y libtinfo5
 
