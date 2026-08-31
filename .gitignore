@@ -1,0 +1,123 @@
+## Prerequisites
+*.d
+*.xpr
+*.sif
+
+## Directory
+build/**/
+**/linux-adi
+**/hdl
+**/pldev
+BIN_pkg
+**/sysmod_rootfs
+
+#### Vivado dirs ####
+.Xil
+*.cache/
+*.gen/
+*.hw/
+*.sdk/
+*.srcs/
+*.ip_user_files/
+*.runs/
+.metadata
+*.data
+*.ipdefs
+ipcache
+
+## Export files
+*.xsa
+*.dtb
+*.hwh
+mem_init_sys.txt
+
+## Boot Images
+uImage
+zImage
+*.ub
+
+## simulation results
+**/sim/
+**/*.sim/**/xsim/
+# *.sim\**\xsim\
+!*.wcfg
+!*.coe
+
+## Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+## Linker output
+*.ilk
+*.map
+*.exp
+
+## Precompiled Headers
+*.gch
+*.pch
+
+## Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+## Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+## Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+## Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+*.dwo
+
+## Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+## reports/logs/dump files
+*.jou
+*.log
+*.debug
+*.str
+*.zip
+*.tmp
+*.rst
+*.os
+*.js
+*.pb
+*.dcp
+*.hwdef
+*.vds
+*.veo
+*.wdf
+*.vdi
+*.dmp
+*.rpx
+*.rpt
+*.rlx
+*.prj
+
+## ip
+ipshared
+ipcfg
+**/ip/

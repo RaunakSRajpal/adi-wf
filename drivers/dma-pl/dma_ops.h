@@ -1,0 +1,81 @@
+/*******************************************
+ * @file    dma_ops.h
+ * @author  Raunak Rajpal (rsajpal@bu.edu)
+ * 
+ * @brief   captures the register operations
+ *          required for DMA I/O
+********************************************/
+
+#ifndef DMA_OPS_H
+#define DMA_OPS_H
+
+#include "xil_types.h"
+#include "xil_io.h"
+#include "xstatus.h"
+
+#include "xaxidma.h"
+
+
+#define GPIO_PIN_MAX 118
+#define GPIO_REG_SIZE 4
+
+/**
+ * DMA related device parameters and function prototypes
+**/
+
+#define DDR_BASE_ADDR		0x00000000
+#define MEM_BASE_ADDR		(DDR_BASE_ADDR + 0x1000000)
+
+#define TX_BD_SPACE_BASE	(MEM_BASE_ADDR)
+#define TX_BD_SPACE_HIGH	(MEM_BASE_ADDR + 0x00000FFF)
+#define RX_BD_SPACE_BASE	(MEM_BASE_ADDR + 0x00001000)
+#define RX_BD_SPACE_HIGH	(MEM_BASE_ADDR + 0x00001FFF)
+#define TX_BUFFER_BASE		(MEM_BASE_ADDR + 0x00100000)
+#define RX_BUFFER_BASE		(MEM_BASE_ADDR + 0x00300000)
+#define RX_BUFFER_HIGH		(MEM_BASE_ADDR + 0x004FFFFF)
+
+#define MAX_PKT_LEN		0x20
+#define MARK_UNCACHEABLE        0x701
+
+#define TEST_START_VALUE	0xC
+#define POLL_TIMEOUT_COUNTER	1000000U
+
+#define AXIDMA_MEM_SIZE   (64 * PAGE_SIZE)
+
+static volatile void __iomem *axi_dma_baseptr = NULL;
+
+// static inline uint32_t gpio_pin_rd(uint8_t bank, uint8_t pin);
+
+// static inline void gpio_pin_wr(uint8_t bank, uint8_t pin, uint8_t val);
+
+static inline int map_axi_dma(void) {
+    /* define a base pointer to map PL-AxiDMA to a 64kB of DDR menory block */
+	axi_dma_baseptr = (uint32_t*)ioremap(MEM_BASE_ADDR, AXIDMA_MEM_SIZE);
+	if (axi_dma_baseptr == NULL) {
+		pr_alert("ERROR: failed to map DMA_S_AXI memory: 0x%x\n",  axi_dma_baseptr);
+		return XST_FAILURE;
+	}
+	
+	printk("%s: Successfully mapped in DMA_S_AXI memory at: 0x%x\n", "gpiopl", axi_dma_baseptr);
+
+    return XST_SUCCESS;
+}
+
+static inline void unmap_axi_dma(void) {
+    iounmap(axi_dma_baseptr);
+    return;
+}
+
+
+static int RxSetup(XAxiDma *AxiDmaInstPtr);
+static int TxSetup(XAxiDma *AxiDmaInstPtr);
+static int SendPacket(XAxiDma *AxiDmaInstPtr);
+static int CheckData(void);
+static int CheckDmaResult(XAxiDma *AxiDmaInstPtr);
+
+// static inline void unmap_axi_dma(void) {
+//     iounmap(axi_dma_baseptr);
+//     return;
+// }
+
+#endif

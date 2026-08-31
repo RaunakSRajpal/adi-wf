@@ -1,8 +1,15 @@
-#BINARY		:= hello_world	# gpio_xor-driver
-KERNEL		:= /home/raunak/wise-rsr/linux-adi
+WS_CURRENT	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../..)
+WS		:= $(or $(WS), $(WS_CURRENT))
+include $(WS)/project_setup.env
+include $(WS)/scripts/setup.env
+export
+
+
+BINARY		:= hello_world		# gpio_xor-driver
+KERNEL		:= $(LINUX_DIR)		# /home/raunak/wise-rsr/linux-adi
 KMOD_DIR	:= $(shell pwd)
 
-obj-m += hello_world.o
+obj-m += $(BINARY).o
 
 CC		= $(CROSS_COMPILE)gcc
 LD		= $(CROSS_COMPILE)ld
