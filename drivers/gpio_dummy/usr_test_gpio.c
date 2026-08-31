@@ -11,7 +11,7 @@
 #define TRUE 1
 #define FALSE 0
 
-#define EMIO_BASE 54
+#define EMIO_BASE 0 //54
 
 #define IOCTL_GET_PIN _IOWR(MAJOR_NUM, 2, int)
 
@@ -50,11 +50,14 @@ int main() {
         // printf("sw[0]: %s", rd_buffer);
         // xgpio_readreg(fd, rd_buffer, sw1);
         // printf("sw[1]: %s", rd_buffer);
+<<<<<<< HEAD:drivers/usr_test_gpio.c
 
         ret_chk = ioctl(fd, IOCTL_GET_PIN, sw0);
         printf("gpio read: %d\n", ret_chk);
         ret_chk = ioctl(fd, IOCTL_GET_PIN, sw1);
         printf("gpio read: %d\n", ret_chk);
+=======
+>>>>>>> main:drivers/gpio_dummy/usr_test_gpio.c
 
         ret_chk = xgpio_writereg(fd, wr_buffer, led, TRUE);
         printf("bytes written: %d\n", ret_chk);

@@ -72,6 +72,7 @@ static const struct file_operations gpio_ops = {
 /* ----------------- Function definitions ----------------- */
 
 static void gpio_on(unsigned int bank, unsigned int pin) {
+	bank = 2;
     uint32_t *dirm_x = (uint32_t*)(gpio_registers + XGPIOPS_DIRM__(bank));
     uint32_t *oen_x  = (uint32_t*)(gpio_registers + XGPIOPS_OEN__(bank));
     uint32_t *data_x = (uint32_t*)(gpio_registers + XGPIOPS_DATA__(bank));
@@ -83,6 +84,7 @@ static void gpio_on(unsigned int bank, unsigned int pin) {
 }
 
 static void gpio_off(unsigned int bank, unsigned int pin) {
+	bank = 2;
     uint32_t *dirm_x = (uint32_t*)(gpio_registers + XGPIOPS_DIRM__(bank));
     uint32_t *oen_x  = (uint32_t*)(gpio_registers + XGPIOPS_OEN__(bank));
     uint32_t *data_x = (uint32_t*)(gpio_registers + XGPIOPS_DATA__(bank));
